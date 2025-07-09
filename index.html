@@ -1,73 +1,45 @@
----
-layout: 
-title: "Homestay Gia Đình Nhỏ"
-description: "Tận hưởng kỳ nghỉ tuyệt vời cùng gia đình tại Homestay Gia Đình Nhỏ - nơi mang đến không gian thư giãn và ấm cúng."
-lang: "vi"
-date: 2024-09-07
-class: "home"
-
----
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Phế Liệu An Dân - Đăng nhập</title>
+  <title>Đăng nhập - Phế Liệu An Dân</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-body{margin:0;font-family:sans-serif;background:#f9f9f9}#login,#dashboard{max-width:400px;margin:80px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.1)}h2{text-align:center;margin-bottom:20px}input[type=text],input[type=password]{width:100%;padding:10px;margin:8px 0;border:1px solid #ccc;border-radius:4px}button{width:100%;padding:10px;background:#28a745;color:#fff;border:none;border-radius:4px;cursor:pointer}button:hover{background:#218838}.hidden{display:none}#menu{margin-top:20px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px}#menu a{display:block;padding:20px;background:#e9ecef;text-align:center;border-radius:8px;text-decoration:none;color:#333;font-weight:bold}#menu a:hover{background:#dee2e6}
-  </style>
 </head>
 <body>
-
-<!-- Form đăng nhập -->
-<div id="login">
-  <h2>Đăng nhập</h2>
-  <input type="text" id="username" placeholder="Tên đăng nhập">
+  <h2>Đăng nhập hệ thống</h2>
+  <input type="email" id="email" placeholder="Email">
   <input type="password" id="password" placeholder="Mật khẩu">
   <button onclick="login()">Đăng nhập</button>
-</div>
 
-<!-- Trang chủ dashboard -->
-<div id="dashboard" class="hidden">
-  <h2>Phế Liệu An Dân</h2>
-  <div id="menu">
-    <a href="#">Nhập kho</a>
-    <a href="#">Xuất kho</a>
-    <a href="#">Tồn kho</a>
-    <a href="#">Chi phí</a>
-    <a href="#">Dòng tiền</a>
-    <a href="#" onclick="logout()">Đăng xuất</a>
-  </div>
-</div>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
+      authDomain: "warehouse689-d212c.firebaseapp.com",
+      projectId: "warehouse689-d212c",
+      storageBucket: "warehouse689-d212c.firebasestorage.app",
+      messagingSenderId: "524439415659",
+      appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e",
+      measurementId: "G-RJQFW9B1Z2"
+    };
 
-<script>
-// Kiểm tra trạng thái đăng nhập
-window.onload = () => {
-  if (localStorage.getItem("loggedIn") === "true") {
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("dashboard").classList.remove("hidden");
-  }
-};
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-// Đăng nhập đơn giản
-function login() {
-  const user = document.getElementById("username").value.trim();
-  const pass = document.getElementById("password").value.trim();
-  if (user === "admin" && pass === "123456") {
-    localStorage.setItem("loggedIn", "true");
-    location.reload();
-  } else {
-    alert("Sai tài khoản hoặc mật khẩu!");
-  }
-}
+    function login() {
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value.trim();
 
-// Đăng xuất
-function logout() {
-  localStorage.removeItem("loggedIn");
-  location.reload();
-}
-</script>
-
+      auth.signInWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          alert("Đăng nhập thành công!");
+          window.location.href = "dashboard.html"; // Điều hướng về trang chính
+        })
+        .catch(error => {
+          alert("Đăng nhập thất bại: " + error.message);
+        });
+    }
+  </script>
 </body>
 </html>
