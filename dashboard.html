@@ -630,37 +630,48 @@
         });
       }
 
-      function calculateProfitLoss() {
-        let totalExport = 0;
-        let totalImport = 0;
-        let totalExpense = 0;
-        const dbRef = firebase.database().ref();
-        Promise.all([
-          dbRef.child('exports').once('value'),
-          dbRef.child('imports').once('value'),
-          dbRef.child('cashflow').once('value')
-        ]).then(([exportsSnap, importsSnap, cashflowSnap]) => {
-          // Tổng tiền xuất kho (doanh thu)
-          exportsSnap.forEach(child => {
-            const data = child.val();
-            totalExport += parseFloat(data.total) || 0;
-          });
-          // Tổng tiền nhập kho (giá vốn)
-          importsSnap.forEach(child => {
-            const data = child.val();
-            totalImport += parseFloat(data.total) || 0;
-          });
-          // Tổng chi phí khác
-          cashflowSnap.forEach(child => {
-            const data = child.val();
-            if (data.type === 'chi') {
-              totalExpense += parseFloat(data.amount) || 0;
-            }
-          });
-          const profit = totalExport - totalImport - totalExpense;
-          $('#profitValue').text(profit.toLocaleString() + " đ");
-        });
+function calculateProfitLoss() {
+  let totalExport = 0;     // Doanh thu từ xuất kho
+  let totalImport = 0;     // Chi phí mua hàng từ nhập kho
+  let totalOperating = 0;  // Chi phí hoạt động + mua hàng từ cashflow
+
+  const dbRef = firebase.database().ref();
+  Promise.all([
+    dbRef.child('exports').once('value'),
+    dbRef.child('imports').once('value'),
+    dbRef.child('cashflow').once('value')
+  ]).then(([exportsSnap, importsSnap, cashflowSnap]) => {
+    // 1. Tính tổng tiền xuất kho (doanh thu)
+    exportsSnap.forEach(child => {
+      const data = child.val();
+      totalExport += parseFloat(data.total) || 0;
+    });
+
+    // 2. Tính tổng tiền nhập kho (chi phí mua hàng)
+    importsSnap.forEach(child => {
+      const data = child.val();
+      totalImport += parseFloat(data.total) || 0;
+    });
+
+    // 3. Tính tổng chi phí hoạt động & chi phí mua hàng từ cashflow
+    cashflowSnap.forEach(child => {
+      const data = child.val();
+      if (
+        data.type === 'chi' &&
+        (data.category === 'chi phí hoạt động' || data.category === 'chi phí mua hàng')
+      ) {
+        totalOperating += parseFloat(data.amount) || 0;
       }
+    });
+
+    // 4. Tính lợi nhuận
+    const profit = totalExport - totalImport - totalOperating;
+
+    // 5. Hiển thị kết quả
+    $('#profitValue').text(profit.toLocaleString('vi-VN') + " đ");
+  });
+}
+
       auth.onAuthStateChanged(user => {
         if (!user) return location.href = "index.html";
         $("#userName").text(user.email);
