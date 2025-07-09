@@ -20,26 +20,55 @@
       <button onclick="logout()" class="text-sm font-bold text-red-600 hover:underline">Sign out</button>
     </div>
 
-<h3 class="text-lg font-bold mt-6 mb-2">Chi tiết</h3>
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 mb-4 text-center">
-  <div class="bg-white shadow rounded p-4">
-    <p class="text-sm text-gray-500">Tổng doanh thu</p>
-    <p id="totalRevenue" class="text-xl font-bold text-green-600">0 đ</p>
-  </div>
-  <div class="bg-white shadow rounded p-4">
-    <p class="text-sm text-gray-500">Tổng giá vốn</p>
-    <p id="totalCost" class="text-xl font-bold text-blue-600">0 đ</p>
-  </div>
-  <div class="bg-white shadow rounded p-4">
-    <p class="text-sm text-gray-500">Chi phí hoạt động</p>
-    <p id="totalExpense" class="text-xl font-bold text-orange-600">0 đ</p>
-  </div>
-  <div class="bg-white shadow rounded p-4">
-    <p class="text-sm text-gray-500">Lợi nhuận</p>
-    <p id="profitValue" class="text-xl font-bold text-red-600">0 đ</p>
-  </div>
-</div>
+    <h3 class="text-lg font-bold mt-6 mb-2">Chi tiết</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 mb-4 text-center">
+      <div class="bg-white shadow rounded p-4">
+        <p class="text-sm text-gray-500">Tổng doanh thu</p>
+        <p id="totalRevenue" class="text-xl font-bold text-green-600">0 đ</p>
+      </div>
+      <div class="bg-white shadow rounded p-4">
+        <p class="text-sm text-gray-500">Tổng giá vốn</p>
+        <p id="totalCost" class="text-xl font-bold text-blue-600">0 đ</p>
+      </div>
+      <div class="bg-white shadow rounded p-4">
+        <p class="text-sm text-gray-500">Chi phí hoạt động</p>
+        <p id="totalExpense" class="text-xl font-bold text-orange-600">0 đ</p>
+      </div>
+      <div class="bg-white shadow rounded p-4">
+        <p class="text-sm text-gray-500">Lợi nhuận</p>
+        <p id="profitValue" class="text-xl font-bold text-red-600">0 đ</p>
+      </div>
+    </div>
 
+    <h3 class="text-lg font-bold mb-2 mt-6">Tồn kho</h3>
+    <table class="w-full border text-sm mb-6">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-2 py-1">STT</th>
+          <th class="border px-2 py-1">Tên hàng</th>
+          <th class="border px-2 py-1 text-center">Số lượng</th>
+          <th class="border px-2 py-1 text-center">Đơn vị</th>
+          <th class="border px-2 py-1 text-right">Giá trị tồn</th>
+        </tr>
+      </thead>
+      <tbody id="inventoryTable"></tbody>
+    </table>
+
+    <h3 class="text-lg font-bold mt-6 mb-2">Nguồn tiền hiện có</h3>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="p-4 border rounded bg-white shadow">
+        <div class="text-gray-500">TM</div>
+        <div id="cashTM" class="text-xl font-bold text-green-600">0 đ</div>
+      </div>
+      <div class="p-4 border rounded bg-white shadow">
+        <div class="text-gray-500">VCB</div>
+        <div id="cashVCB" class="text-xl font-bold text-green-600">0 đ</div>
+      </div>
+      <div class="p-4 border rounded bg-white shadow">
+        <div class="text-gray-500">CK</div>
+        <div id="cashCK" class="text-xl font-bold text-green-600">0 đ</div>
+      </div>
+    </div>
 
     <!-- Buttons -->
     <div class="flex gap-4 mt-6 mb-6">
@@ -178,37 +207,6 @@
       </thead>
       <tbody id="incomeExpenseTable"></tbody>
     </table>
-
-    <h3 class="text-lg font-bold mb-2 mt-6">Tồn kho</h3>
-    <table class="w-full border text-sm mb-6">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="border px-2 py-1">STT</th>
-          <th class="border px-2 py-1">Tên hàng</th>
-          <th class="border px-2 py-1 text-center">Số lượng</th>
-          <th class="border px-2 py-1 text-center">Đơn vị</th>
-          <th class="border px-2 py-1 text-right">Giá trị tồn</th>
-        </tr>
-      </thead>
-      <tbody id="inventoryTable"></tbody>
-    </table>
-
-    <h3 class="text-lg font-bold mt-6 mb-2">Nguồn tiền hiện có</h3>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <div class="p-4 border rounded bg-white shadow">
-        <div class="text-gray-500">TM</div>
-        <div id="cashTM" class="text-xl font-bold text-green-600">0 đ</div>
-      </div>
-      <div class="p-4 border rounded bg-white shadow">
-        <div class="text-gray-500">VCB</div>
-        <div id="cashVCB" class="text-xl font-bold text-green-600">0 đ</div>
-      </div>
-      <div class="p-4 border rounded bg-white shadow">
-        <div class="text-gray-500">CK</div>
-        <div id="cashCK" class="text-xl font-bold text-green-600">0 đ</div>
-      </div>
-    </div>
-
 
     <!-- Modal -->
     <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -646,76 +644,63 @@
           $('#cashCK').text(sources.CK.toLocaleString() + " đ");
         });
       }
-
-async function calculateProfitLossFIFO() {
-  const dbRef = firebase.database().ref();
-  const [importsSnap, exportsSnap, cashflowSnap] = await Promise.all([
-    dbRef.child('imports').once('value'),
-    dbRef.child('exports').once('value'),
-    dbRef.child('cashflow').once('value')
-  ]);
-
-  const stock = [];
-
-  // Chuyển dữ liệu nhập kho thành hàng tồn theo FIFO
-  importsSnap.forEach(child => {
-    const data = child.val();
-    const date = data.date || '';
-    data.items.forEach(item => {
-      stock.push({
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        date
-      });
-    });
-  });
-
-  // Sắp xếp theo ngày nhập (FIFO)
-  stock.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  let totalRevenue = 0;
-  let totalCost = 0;
-
-  // Xử lý xuất kho: tính giá vốn theo FIFO
-  exportsSnap.forEach(child => {
-    const data = child.val();
-    totalRevenue += parseFloat(data.total) || 0;
-
-    data.items.forEach(exportItem => {
-      let qtyToProcess = exportItem.quantity;
-
-      for (let i = 0; i < stock.length && qtyToProcess > 0; i++) {
-        const lot = stock[i];
-        if (lot.name === exportItem.name && lot.quantity > 0) {
-          const usedQty = Math.min(qtyToProcess, lot.quantity);
-          totalCost += usedQty * lot.price;
-          lot.quantity -= usedQty;
-          qtyToProcess -= usedQty;
-        }
+      async function calculateProfitLossFIFO() {
+        const dbRef = firebase.database().ref();
+        const [importsSnap, exportsSnap, cashflowSnap] = await Promise.all([
+          dbRef.child('imports').once('value'),
+          dbRef.child('exports').once('value'),
+          dbRef.child('cashflow').once('value')
+        ]);
+        const stock = [];
+        // Chuyển dữ liệu nhập kho thành hàng tồn theo FIFO
+        importsSnap.forEach(child => {
+          const data = child.val();
+          const date = data.date || '';
+          data.items.forEach(item => {
+            stock.push({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+              date
+            });
+          });
+        });
+        // Sắp xếp theo ngày nhập (FIFO)
+        stock.sort((a, b) => new Date(a.date) - new Date(b.date));
+        let totalRevenue = 0;
+        let totalCost = 0;
+        // Xử lý xuất kho: tính giá vốn theo FIFO
+        exportsSnap.forEach(child => {
+          const data = child.val();
+          totalRevenue += parseFloat(data.total) || 0;
+          data.items.forEach(exportItem => {
+            let qtyToProcess = exportItem.quantity;
+            for (let i = 0; i < stock.length && qtyToProcess > 0; i++) {
+              const lot = stock[i];
+              if (lot.name === exportItem.name && lot.quantity > 0) {
+                const usedQty = Math.min(qtyToProcess, lot.quantity);
+                totalCost += usedQty * lot.price;
+                lot.quantity -= usedQty;
+                qtyToProcess -= usedQty;
+              }
+            }
+          });
+        });
+        // Tính tổng chi phí hoạt động
+        let totalExpense = 0;
+        cashflowSnap.forEach(child => {
+          const data = child.val();
+          if (data.type === 'chi' && data.category === 'chi phí hoạt động') {
+            totalExpense += parseFloat(data.amount) || 0;
+          }
+        });
+        const profit = totalRevenue - totalCost - totalExpense;
+        // Hiển thị lên UI
+        $('#totalRevenue').text(totalRevenue.toLocaleString() + " đ");
+        $('#totalCost').text(totalCost.toLocaleString() + " đ");
+        $('#totalExpense').text(totalExpense.toLocaleString() + " đ");
+        $('#profitValue').text(profit.toLocaleString() + " đ");
       }
-    });
-  });
-
-  // Tính tổng chi phí hoạt động
-  let totalExpense = 0;
-  cashflowSnap.forEach(child => {
-    const data = child.val();
-    if (data.type === 'chi' && data.category === 'chi phí hoạt động') {
-      totalExpense += parseFloat(data.amount) || 0;
-    }
-  });
-
-  const profit = totalRevenue - totalCost - totalExpense;
-
-  // Hiển thị lên UI
-  $('#totalRevenue').text(totalRevenue.toLocaleString() + " đ");
-  $('#totalCost').text(totalCost.toLocaleString() + " đ");
-  $('#totalExpense').text(totalExpense.toLocaleString() + " đ");
-  $('#profitValue').text(profit.toLocaleString() + " đ");
-}
-
-
       auth.onAuthStateChanged(user => {
         if (!user) return location.href = "index.html";
         $("#userName").text(user.email);
