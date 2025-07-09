@@ -202,7 +202,6 @@
           <th class="border px-2 py-1">Số tiền</th>
           <th class="border px-2 py-1">Người</th>
           <th class="border px-2 py-1">Nguồn</th>
-          <th class="border px-2 py-1">Ghi chú</th>
         </tr>
       </thead>
       <tbody id="incomeExpenseTable"></tbody>
@@ -548,7 +547,6 @@ function editRecord(data, type) {
             <td class="border px-2 py-1 text-right">${Number(d.amount).toLocaleString()}</td>
             <td class="border px-2 py-1">${d.sender || d.content}</td>
             <td class="border px-2 py-1 text-center">${d.source || ''}</td>
-            <td class="border px-2 py-1">${d.note || ''}</td>
           </tr>`;
             tbody.append(row);
           });
