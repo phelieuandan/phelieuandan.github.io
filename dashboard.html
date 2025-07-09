@@ -365,6 +365,57 @@
     currentModalData = null;
     document.getElementById("detailModal").classList.add("hidden");
   }
+
+  function saveIncome() {
+    const data = {
+      type: 'thu',
+      amount: parseFloat(document.getElementById('incomeAmount').value || 0),
+      sender: document.getElementById('incomeSender').value || '',
+      source: document.getElementById('incomeSource').value || '',
+      content: document.getElementById('incomeContent').value || '',
+      note: document.getElementById('incomeNote').value || '',
+      date: new Date().toISOString()
+    };
+    firebase.database().ref('cashflow').push(data).then(() => loadCashflow());
+  }
+
+  function saveExpense() {
+    const data = {
+      type: 'chi',
+      amount: parseFloat(document.getElementById('expenseAmount').value || 0),
+      content: document.getElementById('expenseContent').value || '',
+      source: document.getElementById('expenseSource').value || '',
+      note: document.getElementById('expenseNote').value || '',
+      date: new Date().toISOString()
+    };
+    firebase.database().ref('cashflow').push(data).then(() => loadCashflow());
+  }
+
+  function loadCashflow() {
+    const tbody = document.getElementById('incomeExpenseTable');
+    tbody.innerHTML = '';
+    firebase.database().ref('cashflow').orderByChild('date').once('value', snap => {
+      snap.forEach(child => {
+        const d = child.val();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="border px-2 py-1 text-center">${d.type === 'thu' ? 'Thu' : 'Chi'}</td>
+          <td class="border px-2 py-1 text-center">${new Date(d.date).toLocaleString()}</td>
+          <td class="border px-2 py-1 text-right">${d.amount.toLocaleString()}</td>
+          <td class="border px-2 py-1">${d.type === 'thu' ? d.sender : d.content}</td>
+          <td class="border px-2 py-1 text-center">${d.source}</td>
+          <td class="border px-2 py-1">${d.note}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadCashflow();
+  });
+
+  
 </script>
 
 
