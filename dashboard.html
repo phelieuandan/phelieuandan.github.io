@@ -16,11 +16,11 @@
   <div class="max-w-6xl mx-auto bg-white shadow rounded-lg p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-green-600">Hi, <span id="userName">Username</span></h2>
-      <button onclick="logout()" class="text-sm text-red-600 hover:underline">Sign out</button>
+      <h2 class="text-xl font-bold text-green-600">Xin chào, <span id="userName">Người dùng</span></h2>
+      <button onclick="logout()" class="text-sm text-red-600 hover:underline">Đăng xuất</button>
     </div>
 
-    <!-- Buttons Thu/Chi -->
+    <!-- Buttons -->
     <div class="flex gap-4 mb-6">
       <button onclick="toggleForm('importForm')" class="bg-green-600 text-white px-4 py-2 rounded">+ Nhập kho</button>
       <button onclick="toggleForm('exportForm')" class="bg-yellow-600 text-white px-4 py-2 rounded">+ Xuất kho</button>
@@ -28,7 +28,35 @@
       <button onclick="toggleForm('expenseForm')" class="bg-red-600 text-white px-4 py-2 rounded">+ Chi tiền</button>
     </div>
 
-    <!-- Form Thu tiền -->
+    <!-- Import Form -->
+    <div id="importForm" class="hidden border p-4 rounded bg-green-50 mb-6">
+      <h3 class="font-semibold mb-2">Form Nhập Kho</h3>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input id="customerName" placeholder="Tên khách hàng" class="border p-2 rounded" />
+        <input id="address" placeholder="Địa chỉ" class="border p-2 rounded" />
+        <input id="cccd" placeholder="CCCD" class="border p-2 rounded" />
+        <input id="phone" placeholder="Số điện thoại" class="border p-2 rounded" />
+      </div>
+      <div id="importItems" class="space-y-2 mb-2"></div>
+      <button onclick="addItem('importItems')" class="bg-blue-500 text-white px-4 py-1 rounded">+ Thêm mặt hàng</button>
+      <div class="mt-4 font-bold">Tổng tiền: <span id="importTotal">0</span> đ</div>
+      <button onclick="saveImport()" class="mt-2 bg-green-600 text-white px-4 py-2 rounded">Lưu</button>
+    </div>
+
+    <!-- Export Form -->
+    <div id="exportForm" class="hidden border p-4 rounded bg-yellow-50 mb-6">
+      <h3 class="font-semibold mb-2">Form Xuất Kho</h3>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input id="receiverName" placeholder="Người nhận hàng" class="border p-2 rounded" />
+        <input id="receiverPhone" placeholder="Số điện thoại" class="border p-2 rounded" />
+      </div>
+      <div id="exportItems" class="space-y-2 mb-2"></div>
+      <button onclick="addItem('exportItems')" class="bg-blue-500 text-white px-4 py-1 rounded">+ Thêm mặt hàng</button>
+      <div class="mt-4 font-bold">Tổng tiền: <span id="exportTotal">0</span> đ</div>
+      <button onclick="saveExport()" class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded">Lưu</button>
+    </div>
+
+    <!-- Income Form -->
     <div id="incomeForm" class="hidden mb-6 bg-white shadow rounded p-4">
       <h3 class="text-lg font-semibold mb-2">Thu tiền</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -46,7 +74,7 @@
       <button onclick="saveIncome()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Lưu thu tiền</button>
     </div>
 
-    <!-- Form Chi tiền -->
+    <!-- Expense Form -->
     <div id="expenseForm" class="hidden mb-6 bg-white shadow rounded p-4">
       <h3 class="text-lg font-semibold mb-2">Chi tiền</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -62,35 +90,8 @@
       <textarea id="expenseNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-2"></textarea>
       <button onclick="saveExpense()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Lưu chi tiền</button>
     </div>
-    <!-- Form Nhập Kho -->
-    <div id="importForm" class="hidden border p-4 rounded bg-green-50 mb-6">
-      <h3 class="font-semibold mb-2">Form Nhập Kho</h3>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <input id="customerName" placeholder="Tên khách hàng" class="border p-2 rounded" />
-        <input id="address" placeholder="Địa chỉ" class="border p-2 rounded" />
-        <input id="cccd" placeholder="CCCD" class="border p-2 rounded" />
-        <input id="phone" placeholder="Số điện thoại" class="border p-2 rounded" />
-      </div>
-      <div id="importItems" class="space-y-2 mb-2"></div>
-      <button onclick="addItem('importItems')" class="bg-blue-500 text-white px-4 py-1 rounded">+ Thêm mặt hàng</button>
-      <div class="mt-4 font-bold">Tổng tiền: <span id="importTotal">0</span> đ</div>
-      <button onclick="saveImport()" class="mt-2 bg-green-600 text-white px-4 py-2 rounded">Lưu</button>
-    </div>
 
-    <!-- Form Xuất Kho -->
-    <div id="exportForm" class="hidden border p-4 rounded bg-yellow-50 mb-6">
-      <h3 class="font-semibold mb-2">Form Xuất Kho</h3>
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <input id="receiverName" placeholder="Người nhận hàng" class="border p-2 rounded" />
-        <input id="receiverPhone" placeholder="Số điện thoại" class="border p-2 rounded" />
-      </div>
-      <div id="exportItems" class="space-y-2 mb-2"></div>
-      <button onclick="addItem('exportItems')" class="bg-blue-500 text-white px-4 py-1 rounded">+ Thêm mặt hàng</button>
-      <div class="mt-4 font-bold">Tổng tiền: <span id="exportTotal">0</span> đ</div>
-      <button onclick="saveExport()" class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded">Lưu</button>
-    </div>
-
-    <!-- Bảng Nhập kho -->
+    <!-- Nhập kho Table -->
     <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Nhập kho</h3>
     <table class="w-full border text-sm mb-6">
       <thead class="bg-green-100">
@@ -105,9 +106,9 @@
       <tbody id="importTable"></tbody>
     </table>
 
-    <!-- Bảng Xuất kho -->
+    <!-- Xuất kho Table -->
     <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Xuất kho</h3>
-    <table class="w-full border text-sm">
+    <table class="w-full border text-sm mb-6">
       <thead class="bg-yellow-100">
         <tr>
           <th class="border px-2 py-1">STT</th>
@@ -119,9 +120,10 @@
       </thead>
       <tbody id="exportTable"></tbody>
     </table>
-    <!-- Bảng Thu Chi Tồn -->
+
+    <!-- Thu Chi Table -->
     <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Thu - Chi</h3>
-    <table class="w-full border text-sm">
+    <table class="w-full border text-sm mb-6">
       <thead class="bg-gray-100">
         <tr>
           <th class="border px-2 py-1">Loại</th>
@@ -135,15 +137,16 @@
       <tbody id="incomeExpenseTable"></tbody>
     </table>
 
-  </div>
-  <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg p-6 max-w-2xl w-full">
-      <h2 class="text-lg font-bold mb-2" id="modalTitle"></h2>
-      <pre id="modalContent" class="text-sm whitespace-pre-wrap"></pre>
-      <div class="flex justify-between mt-4">
-        <button id="editBtn" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Sửa</button>
-        <button id="deleteBtn" class="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600">Xoá</button>
-        <button onclick="closeModal()" class="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400">Đóng</button>
+    <!-- Modal -->
+    <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-white rounded shadow-lg max-w-md w-full p-4">
+        <h2 id="modalTitle" class="text-lg font-semibold mb-2">Chi tiết</h2>
+        <pre id="modalContent" class="text-sm whitespace-pre-wrap"></pre>
+        <div class="flex justify-end gap-2 mt-4">
+          <button id="modalEditBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Sửa</button>
+          <button id="modalDeleteBtn" class="bg-red-600 text-white px-4 py-2 rounded">Xoá</button>
+          <button onclick="closeModal()" class="bg-gray-500 text-white px-4 py-2 rounded">Đóng</button>
+        </div>
       </div>
     </div>
   </div>
