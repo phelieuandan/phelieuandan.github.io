@@ -56,63 +56,61 @@
       <button onclick="saveExport()" class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded">Lưu</button>
     </div>
 
-<!-- Income Form -->
-<div id="incomeForm" class="hidden mb-6 bg-white shadow rounded p-4">
-  <h3 class="text-lg font-semibold mb-4">Thu tiền</h3>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <input type="number" id="incomeAmount" placeholder="Số tiền" class="border p-2 rounded">
-    <input type="text" id="incomeSender" placeholder="Người gửi" class="border p-2 rounded">
-    
-    <select id="incomeSource" class="border p-2 rounded">
-      <option value="">Nguồn tiền</option>
-      <option value="TM">TM</option>
-      <option value="VCB">VCB</option>
-      <option value="CK">CK</option>
-    </select>
+    <!-- Income Form -->
+    <div id="incomeForm" class="hidden mb-6 bg-white shadow rounded p-4">
+      <h3 class="text-lg font-semibold mb-4">Thu tiền</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="number" id="incomeAmount" placeholder="Số tiền" class="border p-2 rounded">
+        <input type="text" id="incomeSender" placeholder="Người gửi" class="border p-2 rounded">
 
-    <input type="text" id="incomeContent" placeholder="Nội dung" class="border p-2 rounded">
+        <input type="text" id="incomeContent" placeholder="Nội dung" class="border p-2 rounded">
+        <select id="incomeCategory" class="border p-2 rounded">
+          <option value="">Phân loại</option>
+          <option value="doanh thu">Doanh thu</option>
+          <option value="vốn đầu tư">Vốn đầu tư</option>
+          <option value="khác">Khác</option>
+        </select>
 
-    <select id="incomeCategory" class="border p-2 rounded">
-      <option value="">Phân loại</option>
-      <option value="doanh thu">Doanh thu</option>
-      <option value="vốn đầu tư">Vốn đầu tư</option>
-      <option value="khác">Khác</option>
-    </select>
-  </div>
+        <select id="incomeSource" class="border p-2 rounded">
+          <option value="">Nguồn tiền</option>
+          <option value="TM">TM</option>
+          <option value="VCB">VCB</option>
+          <option value="CK">CK</option>
+        </select>
+      </div>
 
-  <textarea id="incomeNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-4"></textarea>
+      <textarea id="incomeNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-4"></textarea>
 
-  <button onclick="saveIncome()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Lưu thu tiền</button>
-</div>
+      <button onclick="saveIncome()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Lưu thu tiền</button>
+    </div>
 
+    <!-- Expense Form -->
+    <div id="expenseForm" class="hidden mb-6 bg-white shadow rounded p-4">
+      <h3 class="text-lg font-semibold mb-4">Chi tiền</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
+        <input type="text" id="expenseSender" placeholder="Người gửi" class="border p-2 rounded">
 
-<!-- Expense Form -->
-<div id="expenseForm" class="hidden mb-6 bg-white shadow rounded p-4">
-  <h3 class="text-lg font-semibold mb-4">Chi tiền</h3>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
-    <input type="text" id="expenseContent" placeholder="Nội dung" class="border p-2 rounded">
-<input type="text" id="expenseSender" placeholder="Người gửi" class="border p-2 rounded">
-    <select id="expenseCategory" class="border p-2 rounded">
-      <option value="">Phân loại</option>
-      <option value="chi phí hoạt động">Chi phí hoạt động</option>
-      <option value="chi phí mua hàng">Chi phí mua hàng</option>
-      <option value="khác">Khác</option>
-    </select>
+        <input type="text" id="expenseContent" placeholder="Nội dung" class="border p-2 rounded">
+        <select id="expenseCategory" class="border p-2 rounded">
+          <option value="">Phân loại</option>
+          <option value="chi phí hoạt động">Chi phí hoạt động</option>
+          <option value="chi phí mua hàng">Chi phí mua hàng</option>
+          <option value="khác">Khác</option>
+        </select>
 
-    <select id="expenseSource" class="border p-2 rounded">
-      <option value="">Nguồn tiền</option>
-      <option value="TM">TM</option>
-      <option value="VCB">VCB</option>
-      <option value="CK">CK</option>
-    </select>
-  </div>
+        <select id="expenseSource" class="border p-2 rounded">
+          <option value="">Nguồn tiền</option>
+          <option value="TM">TM</option>
+          <option value="VCB">VCB</option>
+          <option value="CK">CK</option>
+        </select>
+      </div>
 
-  <textarea id="expenseNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-4"></textarea>
+      <textarea id="expenseNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-4"></textarea>
 
-  <button onclick="saveExpense()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Lưu chi tiền</button>
-</div>
-
+      <button onclick="saveExpense()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Lưu chi tiền</button>
+    </div>
 
     <!-- Nhập kho Table -->
     <h3 class="text-lg font-semibold mb-2 mt-6">Nhập kho</h3>
@@ -658,7 +656,6 @@
           $('#profitValue').text(profit.toLocaleString() + " đ");
         });
       }
-      
       auth.onAuthStateChanged(user => {
         if (!user) return location.href = "index.html";
         $("#userName").text(user.email);
