@@ -228,28 +228,32 @@
         container.find("input, select").off("input").on("input", () => updateTotal(containerId));
       }
 
-  function getValidItems(containerId) {
-    const items = [];
-    $(`#${containerId} > div`).each(function () {
-      const name = $(this).find("input:eq(0)").val();
-      const unit = $(this).find("select").val();
-      const quantity = parseFloat($(this).find("input:eq(2)").val()) || 0;
-      const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
-      if (name && unit && quantity && price) {
-        items.push({ name, unit, quantity, price });
+      function getValidItems(containerId) {
+        const items = [];
+        $(`#${containerId} > div`).each(function() {
+          const name = $(this).find("input:eq(0)").val();
+          const unit = $(this).find("select").val();
+          const quantity = parseFloat($(this).find("input:eq(2)").val()) || 0;
+          const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
+          if (name && unit && quantity && price) {
+            items.push({
+              name,
+              unit,
+              quantity,
+              price
+            });
+          }
+        });
+        return items;
       }
-    });
-    return items;
-  }
 
-        function getNextId(type, prefix) {
-    return db.ref(type).once("value").then(snap => {
-      const count = snap.numChildren() + 1;
-      return prefix + String(count).padStart(6, '0');
-    });
-  }
-
-      window.saveImport = function () {
+      function getNextId(type, prefix) {
+        return db.ref(type).once("value").then(snap => {
+          const count = snap.numChildren() + 1;
+          return prefix + String(count).padStart(6, '0');
+        });
+      }
+      window.saveImport = async function() {
         const name = $('#customerName').val() || 'Không cung cấp thông tin';
         const address = $('#address').val() || 'Không cung cấp thông tin';
         const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
@@ -258,25 +262,90 @@
         const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
         const date = new Date().toISOString();
         const id = currentEditId || await getNextId('imports', 'PNK');
-        const data = { id, name, address, cccd, phone, items, total, date };
+        const data = {
+          id,
+          name,
+          address,
+          cccd,
+          phone,
+          items,
+          total,
+          date
+        };
         db.ref('imports/' + id).set(data).then(() => {
           alert('Đã lưu nhập kho');
           toggleForm(null);
           currentEditId = null;
+          loadTable("imports", "importTable");
         });
       };
-    
-      window.saveExport = function () {
+      window.saveExport = async function() {
         const name = $('#receiverName').val() || 'Không cung cấp thông tin';
         const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
         const items = getValidItems('exportItems');
         const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
         const date = new Date().toISOString();
         const id = currentEditId || await getNextId('exports', 'PXK');
-        const data = { id, name, phone, items, total, date };
+        const data = {
+          id,
+          name,
+          phone,
+          items,
+          total,
+          date
+        };
         db.ref('exports/' + id).set(data).then(() => {
           alert('Đã lưu xuất kho');
           toggleForm(null);
+          currentEditId = null;
+          loadTable("exports", "exportTable");
+        });
+      };
+      window.saveIncome = async function() {
+        const amount = parseFloat($('#incomeAmount').val()) || 0;
+        const sender = $('#incomeSender').val() || 'Không rõ';
+        const source = $('#incomeSource').val() || '';
+        const content = $('#incomeContent').val() || '';
+        const note = $('#incomeNote').val() || '';
+        const date = new Date().toISOString();
+        const id = currentEditId || await getNextId('cashflow', 'PT');
+        const data = {
+          id,
+          type: 'thu',
+          amount,
+          sender,
+          source,
+          content,
+          note,
+          date
+        };
+        db.ref('cashflow/' + id).set(data).then(() => {
+          alert('Đã lưu thu tiền');
+          toggleForm(null);
+          loadCashflow();
+          currentEditId = null;
+        });
+      };
+      window.saveExpense = async function() {
+        const amount = parseFloat($('#expenseAmount').val()) || 0;
+        const content = $('#expenseContent').val() || 'Không rõ';
+        const source = $('#expenseSource').val() || '';
+        const note = $('#expenseNote').val() || '';
+        const date = new Date().toISOString();
+        const id = currentEditId || await getNextId('cashflow', 'PC');
+        const data = {
+          id,
+          type: 'chi',
+          amount,
+          content,
+          source,
+          note,
+          date
+        };
+        db.ref('cashflow/' + id).set(data).then(() => {
+          alert('Đã lưu chi tiền');
+          toggleForm(null);
+          loadCashflow();
           currentEditId = null;
         });
       };
@@ -385,54 +454,6 @@
           });
         });
       }
-      window.saveIncome = function() {
-        const amount = parseFloat($('#incomeAmount').val()) || 0;
-        const sender = $('#incomeSender').val() || 'Không rõ';
-        const source = $('#incomeSource').val() || '';
-        const content = $('#incomeContent').val() || '';
-        const note = $('#incomeNote').val() || '';
-        const date = new Date().toISOString();
-        const id = currentEditId || await getNextId('cashflow', 'PT');
-        const data = {
-          id,
-          type: 'thu',
-          amount,
-          sender,
-          source,
-          content,
-          note,
-          date
-        };
-        db.ref('cashflow/' + id).set(data).then(() => {
-          alert('Đã lưu thu tiền');
-          toggleForm(null);
-          loadCashflow();
-          currentEditId = null;
-        });
-      };
-      window.saveExpense = function() {
-        const amount = parseFloat($('#expenseAmount').val()) || 0;
-        const content = $('#expenseContent').val() || 'Không rõ';
-        const source = $('#expenseSource').val() || '';
-        const note = $('#expenseNote').val() || '';
-        const date = new Date().toISOString();
-        const id = currentEditId || await getNextId('cashflow', 'PC');
-        const data = {
-          id,
-          type: 'chi',
-          amount,
-          content,
-          source,
-          note,
-          date
-        };
-        db.ref('cashflow/' + id).set(data).then(() => {
-          alert('Đã lưu chi tiền');
-          toggleForm(null);
-          loadCashflow();
-          currentEditId = null;
-        });
-      };
     });
   </script>
 
