@@ -17,7 +17,7 @@
     <!-- Header -->
     <div class="flex justify-between items-center mb-4">
       <h2 class="text-xl font-bold text-green-600">Hi, <span id="userName">Username</span></h2>
-      <button onclick="logout()" class="text-sm text-red-600 hover:underline">Sign out</button>
+      <button onclick="logout()" class="text-sm font-bold text-red-600 hover:underline">Sign out</button>
     </div>
 
     <!-- Buttons -->
@@ -92,7 +92,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
     <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
     <input type="text" id="expenseContent" placeholder="Nội dung" class="border p-2 rounded">
-
+<input type="text" id="expenseSender" placeholder="Người gửi" class="border p-2 rounded">
     <select id="expenseCategory" class="border p-2 rounded">
       <option value="">Phân loại</option>
       <option value="chi phí hoạt động">Chi phí hoạt động</option>
