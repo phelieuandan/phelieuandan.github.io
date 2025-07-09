@@ -216,9 +216,9 @@
             <option value="Kg" ${item.unit === 'Kg' ? 'selected' : ''}>Kg</option>
             <option value="Cái" ${item.unit === 'Cái' ? 'selected' : ''}>Cái</option>
           </select>
-          <input type="number" value="${item.quantity}" class="border p-1 rounded" />
-          <input type="number" value="${item.price}" class="border p-1 rounded" />
-          <input value="${(item.quantity * item.price).toLocaleString()}" class="border p-1 rounded bg-gray-100" readonly />
+          <input type="number" placeholder="Số lượng" value="${item.quantity}" class="border p-1 rounded qty" />
+          <input type="number" placeholder="Đơn giá" value="${item.price}" class="border p-1 rounded price" />
+          <input value="${(item.quantity * item.price).toLocaleString()}" placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
         </div>`;
           container.append(row);
         });
