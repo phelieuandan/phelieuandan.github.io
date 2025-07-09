@@ -192,24 +192,6 @@
   </div>`;
         $("#" + containerId).append(itemHtml);
       };
-      // Cho cả nhập kho
-      $(document).on('input', '#importItems .qty, #importItems .price', function() {
-        const row = $(this).closest('.grid');
-        const qty = parseFloat(row.find('.qty').val()) || 0;
-        const price = parseFloat(row.find('.price').val()) || 0;
-        const amount = qty * price;
-        row.find('input').eq(4).val(amount.toLocaleString());
-        updateTotal('importItems');
-      });
-      // Cho cả xuất kho
-      $(document).on('input', '#exportItems .qty, #exportItems .price', function() {
-        const row = $(this).closest('.grid');
-        const qty = parseFloat(row.find('.qty').val()) || 0;
-        const price = parseFloat(row.find('.price').val()) || 0;
-        const amount = qty * price;
-        row.find('input').eq(4).val(amount.toLocaleString());
-        updateTotal('exportItems');
-      });
 
       function updateTotal(containerId) {
         let total = 0;
@@ -487,6 +469,22 @@
           });
         });
       }
+// Tự động cập nhật Thành tiền khi nhập Số lượng hoặc Đơn giá
+$(document).on('input', '.qty, .price', function () {
+  const row = $(this).closest('.grid');
+  const qty = parseFloat(row.find('.qty').val()) || 0;
+  const price = parseFloat(row.find('.price').val()) || 0;
+  const amount = qty * price;
+  row.find('input[readonly]').val(amount.toLocaleString());
+
+  // Cập nhật tổng tiền
+  if ($(this).closest('#importItems').length) {
+    updateTotal('importItems');
+  } else if ($(this).closest('#exportItems').length) {
+    updateTotal('exportItems');
+  }
+});
+
     });
   </script>
 
