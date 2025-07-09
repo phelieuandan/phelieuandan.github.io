@@ -1,16 +1,45 @@
-<h1>Chào mừng đến Phế Liệu An Dân</h1>
-<button onclick="logout()">Đăng xuất</button>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Phế Liệu An Dân</title>
+</head>
+<body>
+  <h2>Chào mừng, <span id="tenNguoiDung">người dùng</span>!</h2>
+  <button onclick="logout()">Đăng xuất</button>
 
-<script>
-  firebase.auth().onAuthStateChanged(user => {
-    if (!user) {
-      window.location.href = "index.html"; // Chưa đăng nhập → quay lại login
-    }
-  });
+  <!-- ✅ Nhúng Firebase SDK compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
 
-  function logout() {
-    firebase.auth().signOut().then(() => {
-      window.location.href = "index.html";
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
+      authDomain: "warehouse689-d212c.firebaseapp.com",
+      projectId: "warehouse689-d212c",
+      storageBucket: "warehouse689-d212c.firebasestorage.app",
+      messagingSenderId: "524439415659",
+      appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e",
+      measurementId: "G-RJQFW9B1Z2"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // Kiểm tra nếu chưa đăng nhập thì chuyển về trang login
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        document.getElementById("tenNguoiDung").innerText = user.displayName || user.email;
+      } else {
+        window.location.href = "index.html";
+      }
     });
-  }
-</script>
+
+    function logout() {
+      firebase.auth().signOut().then(() => {
+        window.location.href = "index.html";
+      });
+    }
+  </script>
+</body>
+</html>
