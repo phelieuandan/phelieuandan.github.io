@@ -3,18 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <title>Đăng nhập - Phế Liệu An Dân</title>
-</head>
-<body>
-  <h2>Đăng nhập hệ thống</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Mật khẩu">
-  <button onclick="login()">Đăng nhập</button>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- 🔥 Nhúng đúng phiên bản Firebase compat -->
+  <!-- ✅ Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ Firebase compat SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div id="loginBox" class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
+    <h2 class="text-2xl font-bold text-center mb-6 text-green-600">Phế Liệu An Dân</h2>
+
+    <input type="email" id="email" placeholder="Email" class="w-full mb-4 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400">
+    <input type="password" id="password" placeholder="Mật khẩu" class="w-full mb-6 px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-400">
+    <button onclick="login()" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">Đăng nhập</button>
+  </div>
 
   <script>
+    // Cấu hình Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
       authDomain: "warehouse689-d212c.firebaseapp.com",
@@ -28,19 +37,28 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+    // ✅ Nếu đã đăng nhập thì chuyển sang dashboard
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        window.location.href = "dashboard.html";
+      }
+    });
+
+    // ✅ Hàm đăng nhập
     function login() {
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
 
       auth.signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
+        .then(() => {
           alert("Đăng nhập thành công!");
           window.location.href = "dashboard.html";
         })
         .catch(error => {
-          alert("Đăng nhập thất bại: " + error.message);
+          alert("Lỗi: " + error.message);
         });
     }
   </script>
+
 </body>
 </html>
