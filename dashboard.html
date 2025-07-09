@@ -63,7 +63,6 @@
         <input type="number" id="incomeAmount" placeholder="Số tiền" class="border p-2 rounded">
         <input type="text" id="incomeSender" placeholder="Người gửi" class="border p-2 rounded">
         <select id="incomeSource" class="border p-2 rounded">
-          <option value="">Nguồn</option>
           <option value="TM">TM</option>
           <option value="VCB">VCB</option>
           <option value="CK">CK</option>
@@ -81,7 +80,6 @@
         <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
         <input type="text" id="expenseContent" placeholder="Nội dung" class="border p-2 rounded">
         <select id="expenseSource" class="border p-2 rounded">
-          <option value="">Nguồn</option>
           <option value="TM">TM</option>
           <option value="VCB">VCB</option>
           <option value="CK">CK</option>
@@ -164,8 +162,6 @@
     $(document).ready(function() {
       const auth = firebase.auth();
       const db = firebase.database();
-      let currentModalData = null;
-      let currentModalType = null;
       let currentEditId = null;
       let currentEditType = null;
       auth.onAuthStateChanged(user => {
@@ -184,17 +180,16 @@
       };
       window.addItem = function(containerId) {
         const itemHtml = `
-        <div class="grid grid-cols-5 gap-2">
-          <input placeholder="Tên hàng" class="border p-1 rounded" />
-          <select class="border p-1 rounded">
-            <option value="kg">kg</option>
-            <option value="cái">cái</option>
-          </select>
-          <input type="number" placeholder="Số lượng" class="border p-1 rounded" />
-          <input type="number" placeholder="Đơn giá" class="border p-1 rounded" />
-          <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
-        </div>
-      `;
+      <div class="grid grid-cols-5 gap-2">
+        <input placeholder="Tên hàng" class="border p-1 rounded" />
+        <select class="border p-1 rounded">
+          <option value="kg">kg</option>
+          <option value="cái">cái</option>
+        </select>
+        <input type="number" placeholder="Số lượng" class="border p-1 rounded" />
+        <input type="number" placeholder="Đơn giá" class="border p-1 rounded" />
+        <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
+      </div>`;
         $("#" + containerId).append(itemHtml);
         $("#" + containerId + " input, select").off("input").on("input", function() {
           updateTotal(containerId);
@@ -210,26 +205,27 @@
           $(this).find("input:eq(4)").val(amt.toLocaleString());
           total += amt;
         });
-        $("#" + (containerId === "importItems" ? "importTotal" : "exportTotal")).text(total.toLocaleString());
+        $(`#${containerId === "importItems" ? "importTotal" : "exportTotal"}`).text(total.toLocaleString());
       }
 
-      function getValidItems(containerId) {
-        const items = [];
-        $(`#${containerId} > div`).each(function() {
-          const name = $(this).find("input:eq(0)").val();
-          const unit = $(this).find("select").val();
-          const qty = parseFloat($(this).find("input:eq(2)").val()) || 0;
-          const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
-          if (name && unit && qty && price) {
-            items.push({
-              name,
-              unit,
-              quantity: qty,
-              price
-            });
-          }
+      function fillItems(containerId, items) {
+        const container = $("#" + containerId);
+        container.empty();
+        items.forEach(item => {
+          const row = `
+        <div class="grid grid-cols-5 gap-2">
+          <input value="${item.name}" class="border p-1 rounded" />
+          <select class="border p-1 rounded">
+            <option value="kg" ${item.unit === 'kg' ? 'selected' : ''}>kg</option>
+            <option value="cái" ${item.unit === 'cái' ? 'selected' : ''}>cái</option>
+          </select>
+          <input type="number" value="${item.quantity}" class="border p-1 rounded" />
+          <input type="number" value="${item.price}" class="border p-1 rounded" />
+          <input value="${(item.quantity * item.price).toLocaleString()}" class="border p-1 rounded bg-gray-100" readonly />
+        </div>`;
+          container.append(row);
         });
-        return items;
+        container.find("input, select").off("input").on("input", () => updateTotal(containerId));
       }
 
       function loadTable(type, tableId) {
@@ -240,22 +236,21 @@
           snap.forEach(child => {
             const d = child.val();
             const row = `
-            <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "${type}")'>
-              <td class="border px-2 py-1">${index++}</td>
-              <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
-              <td class="border px-2 py-1">${d.name}</td>
-              <td class="border px-2 py-1 text-center">${d.items?.length || 0}</td>
-              <td class="border px-2 py-1 text-right">${Number(d.total || d.amount || 0).toLocaleString()}</td>
-            </tr>
-          `;
+          <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "${type}")'>
+            <td class="border px-2 py-1">${index++}</td>
+            <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
+            <td class="border px-2 py-1">${d.name}</td>
+            <td class="border px-2 py-1 text-center">${d.items?.length || 0}</td>
+            <td class="border px-2 py-1 text-right">${Number(d.total || d.amount || 0).toLocaleString()}</td>
+          </tr>`;
             tbody.append(row);
           });
         });
       }
       window.showModal = function(data, type) {
-        currentModalData = data;
-        currentModalType = type;
-        let lines = [`Mã phiếu: ${data.id || ''}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name || data.sender || ''}`, `Tổng tiền: ${(data.total || data.amount || 0).toLocaleString()} đ`];
+        currentEditId = data.id;
+        currentEditType = type;
+        const lines = [`Mã phiếu: ${data.id || ''}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name || data.sender || ''}`, `Tổng tiền: ${(data.total || data.amount || 0).toLocaleString()} đ`];
         if (data.items) {
           lines.push("--- Mặt hàng ---");
           data.items.forEach((i, idx) => {
@@ -271,11 +266,9 @@
         $('#modalEditBtn').off().on('click', () => editRecord(data, type));
         $('#modalDeleteBtn').off().on('click', () => deleteRecord(data.id, type));
         $('#detailModal').removeClass('hidden');
-      }
+      };
 
       function editRecord(data, type) {
-        currentEditId = data.id;
-        currentEditType = type;
         if (type === 'imports') {
           $('#customerName').val(data.name);
           $('#address').val(data.address);
@@ -317,10 +310,8 @@
         }
       }
       window.closeModal = function() {
-        currentModalData = null;
-        currentEditId = null;
         $('#detailModal').addClass('hidden');
-      }
+      };
 
       function loadCashflow() {
         const tbody = $('#incomeExpenseTable');
@@ -329,20 +320,69 @@
           snap.forEach(child => {
             const d = child.val();
             const row = `
-            <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "cashflow")'>
-              <td class="border px-2 py-1 text-center">${d.type === 'thu' ? 'Thu' : 'Chi'}</td>
-              <td class="border px-2 py-1 text-center">${new Date(d.date).toLocaleString()}</td>
-              <td class="border px-2 py-1 text-right">${Number(d.amount).toLocaleString()}</td>
-              <td class="border px-2 py-1">${d.sender || d.content}</td>
-              <td class="border px-2 py-1 text-center">${d.source || ''}</td>
-              <td class="border px-2 py-1">${d.note || ''}</td>
-            </tr>`;
+          <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "cashflow")'>
+            <td class="border px-2 py-1 text-center">${d.type === 'thu' ? 'Thu' : 'Chi'}</td>
+            <td class="border px-2 py-1 text-center">${new Date(d.date).toLocaleDateString()}</td>
+            <td class="border px-2 py-1 text-right">${Number(d.amount).toLocaleString()}</td>
+            <td class="border px-2 py-1">${d.sender || d.content}</td>
+            <td class="border px-2 py-1 text-center">${d.source || ''}</td>
+            <td class="border px-2 py-1">${d.note || ''}</td>
+          </tr>`;
             tbody.append(row);
           });
         });
       }
+      window.saveIncome = function() {
+        const amount = parseFloat($('#incomeAmount').val()) || 0;
+        const sender = $('#incomeSender').val() || 'Không rõ';
+        const source = $('#incomeSource').val() || '';
+        const content = $('#incomeContent').val() || '';
+        const note = $('#incomeNote').val() || '';
+        const date = new Date().toISOString();
+        const id = currentEditId || db.ref().child('cashflow').push().key;
+        const data = {
+          id,
+          type: 'thu',
+          amount,
+          sender,
+          source,
+          content,
+          note,
+          date
+        };
+        db.ref('cashflow/' + id).set(data).then(() => {
+          alert('Đã lưu thu tiền');
+          toggleForm(null);
+          loadCashflow();
+          currentEditId = null;
+        });
+      };
+      window.saveExpense = function() {
+        const amount = parseFloat($('#expenseAmount').val()) || 0;
+        const content = $('#expenseContent').val() || 'Không rõ';
+        const source = $('#expenseSource').val() || '';
+        const note = $('#expenseNote').val() || '';
+        const date = new Date().toISOString();
+        const id = currentEditId || db.ref().child('cashflow').push().key;
+        const data = {
+          id,
+          type: 'chi',
+          amount,
+          content,
+          source,
+          note,
+          date
+        };
+        db.ref('cashflow/' + id).set(data).then(() => {
+          alert('Đã lưu chi tiền');
+          toggleForm(null);
+          loadCashflow();
+          currentEditId = null;
+        });
+      };
     });
   </script>
+
 </body>
 
 </html>
