@@ -1,0 +1,239 @@
+---
+layout: 
+title: "Sao Mai Media - Hân hạnh được phục vụ"
+permalink: /play
+description: "Sao Mai Media - Nơi bạn thăng hoa cảm xúc với dịch vụ Karaoke đẳng cấp."
+---
+
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'vi' }}">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <title>{{ page.title | default: site.title }}</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: black;
+      color: white;
+    }
+  body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  #videoContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  #youtubeIframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+    @font-face {
+      font-family: saomaiMedia;
+      font-style: normal;
+      font-display: swap;
+      src: url(https://homestaygiadinhnho.github.io/assets/fonts/SpotifyMixUI-Regular.woff2) format("woff2");
+      font-weight: 400;
+    }
+
+    @font-face {
+      font-family: saomaiMedia;
+      font-style: normal;
+      font-display: swap;
+      src: url(https://homestaygiadinhnho.github.io/assets/fonts/SpotifyMixUITitle-Bold.woff2) format("woff2");
+      font-weight: 700;
+    }
+
+    @font-face {
+      font-display: swap;
+      font-family: ui-icons;
+      src: url(https://homestaygiadinhnho.github.io/assets/fonts/ui-icons.woff2) format("woff2");
+    }
+  </style>
+</head>
+<body>
+  <div id="videoContainer"></div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+const supabaseUrl = 'https://wndajplczagmlxbvkmtk.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InduZGFqcGxjemFnbWx4YnZrbXRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjgwMTUzNDcsImV4cCI6MjA0MzU5MTM0N30.1ffeOEC-jOQtar3tgD8OPBUeyK79itCPYmBe3_k08MA';
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+let videoIds = [];
+let isVideoPlaying = false; // Đánh dấu trạng thái video đang phát
+let player;
+
+// Hàm lấy danh sách video chưa phát từ cơ sở dữ liệu
+async function getUnplayedVideoIds() {
+    const { data, error } = await supabaseClient
+        .from('karaoke_songs')
+        .select('video_id')
+        .eq('played', false)
+        .order('priority', { ascending: false })
+        .order('id', { ascending: true });
+
+    if (error) {
+        console.error('Có lỗi xảy ra khi lấy video_ids:', error);
+        return [];
+    }
+
+    return data.map(song => song.video_id);
+}
+
+// Hàm cập nhật danh sách bài hát
+async function fetchAndUpdateSongs() {
+    videoIds = await getUnplayedVideoIds();
+
+    if (videoIds.length > 0) {
+        const currentVideoId = videoIds[0];
+        const nextVideoId = videoIds.length > 1 ? videoIds[1] : null;
+
+        // Đặt trạng thái bài hát hiện tại
+        const { error: resetPlayingError } = await supabaseClient
+            .from('karaoke_songs')
+            .update({ playing: false })
+            .eq('played', false);
+
+        if (!resetPlayingError) {
+            const { data: updateData, error: updateError } = await supabaseClient
+                .from('karaoke_songs')
+                .update({ playing: true })
+                .eq('video_id', currentVideoId);
+
+            if (!updateError) {
+                console.log('Cập nhật trạng thái playing thành công cho video:', currentVideoId);
+
+                // Đặt tất cả các bài hát chưa chơi về next: false trước
+                const { error: resetNextError } = await supabaseClient
+                    .from('karaoke_songs')
+                    .update({ next: false })
+                    .eq('played', false); // Điều kiện WHERE để cập nhật
+
+                if (resetNextError) {
+                    console.error('Có lỗi khi đặt next về false:', resetNextError);
+                } else {
+                    console.log('Đặt tất cả next về false thành công.');
+
+                    // Cập nhật bài hát tiếp theo thành next: true
+                    if (nextVideoId) {
+                        const { data: nextUpdateData, error: nextUpdateError } = await supabaseClient
+                            .from('karaoke_songs')
+                            .update({ next: true })
+                            .eq('video_id', nextVideoId);
+
+                        if (nextUpdateError) {
+                            console.error('Có lỗi khi cập nhật bài hát tiếp theo:', nextUpdateError);
+                        } else {
+                            console.log('Cập nhật bài hát tiếp theo thành công:', nextVideoId);
+                        }
+                    } else {
+                        console.log('Không có bài hát tiếp theo.');
+                    }
+                }
+
+                displayVideo(currentVideoId);
+            } else {
+                console.error('Có lỗi khi cập nhật trạng thái playing:', updateError);
+            }
+        } else {
+            console.error('Có lỗi khi reset trạng thái playing:', resetPlayingError);
+        }
+    } else {
+        console.log('Không có video nào để phát.');
+    }
+}
+
+// Hàm cập nhật trạng thái bài hát khi kết thúc
+async function updateSongStatusOnFinish(currentVideoId) {
+    const { data: updateData, error: updateError } = await supabaseClient
+        .from('karaoke_songs')
+        .update({ playing: false, played: true })
+        .eq('video_id', currentVideoId);
+
+    if (!updateError) {
+        console.log('Cập nhật trạng thái bài hát đã phát thành công:', updateData);
+        await fetchAndUpdateSongs();
+    }
+}
+
+// Hàm xử lý sự thay đổi trạng thái video
+function onPlayerStateChange(event) {
+    if (event.data === YT.PlayerState.PLAYING) {
+        isVideoPlaying = true;
+    }
+    if (event.data === YT.PlayerState.ENDED) {
+        isVideoPlaying = false;
+        const currentVideoId = videoIds[0];
+        updateSongStatusOnFinish(currentVideoId);
+    }
+}
+
+// Hiển thị video theo videoId
+function displayVideo(videoId) {
+    const container = document.getElementById('videoContainer');
+    container.innerHTML = '';
+
+    const iframe = document.createElement('iframe');
+    iframe.id = 'youtubeIframe';
+    iframe.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1&autoplay=1&rel=0&showinfo=0&playlist=${videoId}`;
+    iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    iframe.allowFullscreen = true;
+    container.appendChild(iframe); 
+
+    player = new YT.Player('youtubeIframe', {
+        events: {
+            'onStateChange': onPlayerStateChange
+        }
+    });
+}
+
+// Hàm cập nhật danh sách song song mà không ảnh hưởng đến video hiện tại
+async function fetchAndUpdateSongsBackground() {
+    const newVideoIds = await getUnplayedVideoIds();
+
+    // Chỉ cập nhật danh sách nếu có sự thay đổi
+    if (JSON.stringify(newVideoIds) !== JSON.stringify(videoIds)) {
+        videoIds = newVideoIds;
+        console.log('Danh sách video đã được cập nhật.');
+    } else {
+        console.log('Không có thay đổi trong danh sách video.');
+    }
+}
+
+// Gọi hàm cập nhật danh sách mỗi 30 giây mà không ảnh hưởng đến video đang phát
+setInterval(fetchAndUpdateSongsBackground, 3000);
+
+$(document).ready(function() {
+    fetchAndUpdateSongs(); // Gọi hàm để lấy danh sách bài hát ban đầu
+});
+</script>
+
+
+
+
+
+
+
+
+</body>
+</html>
+
