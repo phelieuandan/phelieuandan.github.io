@@ -20,23 +20,23 @@
       <button onclick="logout()" class="text-sm font-bold text-red-600 hover:underline">Sign out</button>
     </div>
 
-<h3 class="text-lg font-semibold mt-6 mb-2">Chi tiết</h3>
+<h3 class="text-lg font-bold mt-6 mb-2">Chi tiết</h3>
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4 mb-4 text-center">
   <div class="bg-white shadow rounded p-4">
     <p class="text-sm text-gray-500">Tổng doanh thu</p>
-    <p id="totalRevenue" class="text-xl font-semibold text-green-600">0 đ</p>
+    <p id="totalRevenue" class="text-xl font-bold text-green-600">0 đ</p>
   </div>
   <div class="bg-white shadow rounded p-4">
     <p class="text-sm text-gray-500">Tổng giá vốn</p>
-    <p id="totalCost" class="text-xl font-semibold text-blue-600">0 đ</p>
+    <p id="totalCost" class="text-xl font-bold text-blue-600">0 đ</p>
   </div>
   <div class="bg-white shadow rounded p-4">
     <p class="text-sm text-gray-500">Chi phí hoạt động</p>
-    <p id="totalExpense" class="text-xl font-semibold text-orange-600">0 đ</p>
+    <p id="totalExpense" class="text-xl font-bold text-orange-600">0 đ</p>
   </div>
   <div class="bg-white shadow rounded p-4">
     <p class="text-sm text-gray-500">Lợi nhuận</p>
-    <p id="profitValue" class="text-xl font-semibold text-red-600">0 đ</p>
+    <p id="profitValue" class="text-xl font-bold text-red-600">0 đ</p>
   </div>
 </div>
 
@@ -51,7 +51,7 @@
 
     <!-- Import Form -->
     <div id="importForm" class="hidden border p-4 rounded bg-green-50 mb-6">
-      <h3 class="font-semibold mb-2">Form Nhập Kho</h3>
+      <h3 class="font-bold mb-2">Form Nhập Kho</h3>
       <div class="grid grid-cols-2 gap-4 mb-4">
         <input id="customerName" placeholder="Tên khách hàng" class="border p-2 rounded" />
         <input id="address" placeholder="Địa chỉ" class="border p-2 rounded" />
@@ -66,7 +66,7 @@
 
     <!-- Export Form -->
     <div id="exportForm" class="hidden border p-4 rounded bg-yellow-50 mb-6">
-      <h3 class="font-semibold mb-2">Form Xuất Kho</h3>
+      <h3 class="font-bold mb-2">Form Xuất Kho</h3>
       <div class="grid grid-cols-2 gap-4 mb-4">
         <input id="receiverName" placeholder="Người nhận hàng" class="border p-2 rounded" />
         <input id="receiverPhone" placeholder="Số điện thoại" class="border p-2 rounded" />
@@ -79,7 +79,7 @@
 
     <!-- Income Form -->
     <div id="incomeForm" class="hidden mb-6 bg-white shadow rounded p-4">
-      <h3 class="text-lg font-semibold mb-4">Thu tiền</h3>
+      <h3 class="text-lg font-bold mb-4">Thu tiền</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input type="number" id="incomeAmount" placeholder="Số tiền" class="border p-2 rounded">
         <input type="text" id="incomeSender" placeholder="Người gửi" class="border p-2 rounded">
@@ -107,7 +107,7 @@
 
     <!-- Expense Form -->
     <div id="expenseForm" class="hidden mb-6 bg-white shadow rounded p-4">
-      <h3 class="text-lg font-semibold mb-4">Chi tiền</h3>
+      <h3 class="text-lg font-bold mb-4">Chi tiền</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
         <input type="text" id="expenseSender" placeholder="Người gửi" class="border p-2 rounded">
@@ -134,7 +134,7 @@
     </div>
 
     <!-- Nhập kho Table -->
-    <h3 class="text-lg font-semibold mb-2 mt-6">Nhập kho</h3>
+    <h3 class="text-lg font-bold mb-2 mt-6">Nhập kho</h3>
     <table class="w-full border text-sm mb-6">
       <thead class="bg-green-100">
         <tr>
@@ -149,7 +149,7 @@
     </table>
 
     <!-- Xuất kho Table -->
-    <h3 class="text-lg font-semibold mb-2 mt-6">Xuất kho</h3>
+    <h3 class="text-lg font-bold mb-2 mt-6">Xuất kho</h3>
     <table class="w-full border text-sm mb-6">
       <thead class="bg-yellow-100">
         <tr>
@@ -164,7 +164,7 @@
     </table>
 
     <!-- Thu Chi Table -->
-    <h3 class="text-lg font-semibold mb-2 mt-6">Sổ quỹ</h3>
+    <h3 class="text-lg font-bold mb-2 mt-6">Sổ quỹ</h3>
     <table class="w-full border text-sm mb-6">
       <thead class="bg-gray-100">
         <tr>
@@ -179,7 +179,7 @@
       <tbody id="incomeExpenseTable"></tbody>
     </table>
 
-    <h3 class="text-lg font-semibold mb-2 mt-6">Tồn kho</h3>
+    <h3 class="text-lg font-bold mb-2 mt-6">Tồn kho</h3>
     <table class="w-full border text-sm mb-6">
       <thead class="bg-gray-100">
         <tr>
@@ -193,7 +193,7 @@
       <tbody id="inventoryTable"></tbody>
     </table>
 
-    <h3 class="text-lg font-semibold mt-6 mb-2">Nguồn tiền hiện có</h3>
+    <h3 class="text-lg font-bold mt-6 mb-2">Nguồn tiền hiện có</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <div class="p-4 border rounded bg-white shadow">
         <div class="text-gray-500">TM</div>
@@ -213,7 +213,7 @@
     <!-- Modal -->
     <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="bg-white rounded shadow-lg max-w-md w-full p-4">
-        <h2 id="modalTitle" class="text-lg font-semibold mb-2">Chi tiết</h2>
+        <h2 id="modalTitle" class="text-lg font-bold mb-2">Chi tiết</h2>
         <pre id="modalContent" class="text-sm whitespace-pre-wrap"></pre>
         <div class="flex justify-end gap-2 mt-4">
           <button id="modalEditBtn" class="bg-blue-600 text-white px-4 py-2 rounded">Sửa</button>
