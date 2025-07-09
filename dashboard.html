@@ -228,6 +228,20 @@
         container.find("input, select").off("input").on("input", () => updateTotal(containerId));
       }
 
+  function getValidItems(containerId) {
+    const items = [];
+    $(`#${containerId} > div`).each(function () {
+      const name = $(this).find("input:eq(0)").val();
+      const unit = $(this).find("select").val();
+      const quantity = parseFloat($(this).find("input:eq(2)").val()) || 0;
+      const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
+      if (name && unit && quantity && price) {
+        items.push({ name, unit, quantity, price });
+      }
+    });
+    return items;
+  }
+
       window.saveImport = function () {
         const name = $('#customerName').val() || 'Không cung cấp thông tin';
         const address = $('#address').val() || 'Không cung cấp thông tin';
