@@ -2,59 +2,169 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard - Phế Liệu An Dân</title>
+  <title>Phế Liệu An Dân - Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- ✅ Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- ✅ Firebase SDK compat -->
+  <!-- Firebase SDK compat -->
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database-compat.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen p-6">
-
-  <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
+<body class="bg-gray-100 p-6">
+  <div class="max-w-5xl mx-auto bg-white rounded-lg shadow p-6">
     <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <h2 class="text-xl font-semibold text-green-700">Xin chào, <span id="tenNguoiDung">người dùng</span>!</h2>
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold text-green-600">Xin chào, <span id="tenNguoiDung">người dùng</span></h2>
       <button onclick="logout()" class="text-sm text-red-500 hover:underline">Đăng xuất</button>
     </div>
 
-    <!-- Dashboard buttons -->
-    <div class="grid grid-cols-2 gap-4">
-      <button class="bg-green-600 text-white py-3 rounded hover:bg-green-700">Nhập kho</button>
-      <button class="bg-yellow-500 text-white py-3 rounded hover:bg-yellow-600">Xuất kho</button>
-      <button class="bg-blue-500 text-white py-3 rounded hover:bg-blue-600">Tồn kho</button>
-      <button class="bg-purple-500 text-white py-3 rounded hover:bg-purple-600">Chi phí</button>
+    <!-- Nút chọn chức năng -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <button onclick="showForm('nhapkho')" class="bg-green-600 text-white py-2 rounded">Nhập kho</button>
+      <button onclick="alert('Chức năng đang phát triển')" class="bg-yellow-500 text-white py-2 rounded">Xuất kho</button>
+      <button onclick="alert('Chức năng đang phát triển')" class="bg-purple-500 text-white py-2 rounded">Chi phí</button>
+    </div>
+
+    <!-- FORM NHẬP KHO -->
+    <div id="formNhapKho" class="hidden">
+      <h3 class="text-lg font-semibold mb-4">Form Nhập Kho</h3>
+      <!-- Thông tin khách hàng -->
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input id="khachHang" type="text" placeholder="Tên khách hàng" class="border p-2 rounded w-full">
+        <input id="diaChi" type="text" placeholder="Địa chỉ" class="border p-2 rounded w-full">
+        <input id="cccd" type="text" placeholder="CCCD" class="border p-2 rounded w-full">
+        <input id="sdt" type="text" placeholder="SĐT" class="border p-2 rounded w-full">
+      </div>
+
+      <!-- Danh sách hàng hóa -->
+      <div id="dsHangHoa" class="space-y-2 mb-4"></div>
+      <button onclick="themMatHang()" class="bg-blue-500 text-white px-4 py-2 rounded">+ Thêm mặt hàng</button>
+
+      <!-- Tổng tiền -->
+      <div class="mt-4 font-bold">Tổng tiền: <span id="tongTien">0</span> đ</div>
+      <button onclick="luuNhapKho()" class="mt-4 bg-green-600 text-white px-4 py-2 rounded">Lưu</button>
+    </div>
+
+    <!-- BẢNG DỮ LIỆU -->
+    <div class="mt-10">
+      <h3 class="text-lg font-semibold mb-2">Danh sách nhập kho</h3>
+      <table class="w-full border text-sm" id="bangNhapKho">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="border px-2 py-1">Khách hàng</th>
+            <th class="border px-2 py-1">SĐT</th>
+            <th class="border px-2 py-1 text-right">Tổng tiền</th>
+            <th class="border px-2 py-1 text-center">Số mặt hàng</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
   </div>
 
   <script>
+    // Cấu hình Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
       authDomain: "warehouse689-d212c.firebaseapp.com",
       projectId: "warehouse689-d212c",
       storageBucket: "warehouse689-d212c.firebasestorage.app",
       messagingSenderId: "524439415659",
-      appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e",
-      measurementId: "G-RJQFW9B1Z2"
+      appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db = firebase.database();
 
-    firebase.auth().onAuthStateChanged(user => {
+    // Xác thực người dùng
+    auth.onAuthStateChanged(user => {
       if (user) {
         document.getElementById("tenNguoiDung").innerText = user.displayName || user.email;
+        taiDanhSachNhapKho();
       } else {
         window.location.href = "index.html";
       }
     });
 
     function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "index.html";
+      auth.signOut().then(() => window.location.href = "index.html");
+    }
+
+    // Hiển thị form
+    function showForm(type) {
+      document.getElementById("formNhapKho").classList.add("hidden");
+      if (type === "nhapkho") document.getElementById("formNhapKho").classList.remove("hidden");
+    }
+
+    // Thêm 1 mặt hàng
+    function themMatHang() {
+      const row = document.createElement("div");
+      row.className = "grid grid-cols-5 gap-2";
+      row.innerHTML = `
+        <input type="text" placeholder="Tên hàng" class="border p-1 rounded" oninput="tinhTong()">
+        <input type="text" placeholder="ĐVT" class="border p-1 rounded" oninput="tinhTong()">
+        <input type="number" placeholder="SL" class="border p-1 rounded" oninput="tinhTong()">
+        <input type="number" placeholder="Đơn giá" class="border p-1 rounded" oninput="tinhTong()">
+        <input type="text" placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly>
+      `;
+      document.getElementById("dsHangHoa").appendChild(row);
+    }
+
+    // Tính thành tiền và tổng
+    function tinhTong() {
+      let tong = 0;
+      document.querySelectorAll("#dsHangHoa > div").forEach(row => {
+        const sl = parseFloat(row.children[2].value) || 0;
+        const dg = parseFloat(row.children[3].value) || 0;
+        const tt = sl * dg;
+        row.children[4].value = tt.toLocaleString();
+        tong += tt;
+      });
+      document.getElementById("tongTien").innerText = tong.toLocaleString();
+    }
+
+    // Lưu dữ liệu nhập kho
+    function luuNhapKho() {
+      const data = {
+        khachHang: document.getElementById("khachHang").value,
+        diaChi: document.getElementById("diaChi").value,
+        cccd: document.getElementById("cccd").value,
+        sdt: document.getElementById("sdt").value,
+        hangHoa: [],
+        tongTien: document.getElementById("tongTien").innerText.replace(/,/g, "")
+      };
+      document.querySelectorAll("#dsHangHoa > div").forEach(row => {
+        data.hangHoa.push({
+          ten: row.children[0].value,
+          dvt: row.children[1].value,
+          sl: row.children[2].value,
+          dg: row.children[3].value,
+          tt: row.children[4].value
+        });
+      });
+      db.ref("nhapkho").push(data).then(() => {
+        alert("Đã lưu nhập kho!");
+        location.reload();
+      });
+    }
+
+    // Tải danh sách nhập kho
+    function taiDanhSachNhapKho() {
+      const tbody = document.querySelector("#bangNhapKho tbody");
+      db.ref("nhapkho").on("value", snap => {
+        tbody.innerHTML = "";
+        snap.forEach(child => {
+          const d = child.val();
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="border px-2 py-1">${d.khachHang}</td>
+            <td class="border px-2 py-1">${d.sdt}</td>
+            <td class="border px-2 py-1 text-right">${Number(d.tongTien).toLocaleString()}</td>
+            <td class="border px-2 py-1 text-center">${d.hangHoa.length}</td>
+          `;
+          tbody.appendChild(tr);
+        });
       });
     }
   </script>
