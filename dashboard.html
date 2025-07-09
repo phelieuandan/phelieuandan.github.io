@@ -560,48 +560,62 @@
         }
       });
 
-      function calculateInventory() {
-        const inventory = {}; // { "N_Kg": { name: "N", unit: "Kg", quantity: 1, value: 10000 } }
-        function addItems(items, isImport) {
-          items.forEach(item => {
-            const key = item.name + '_' + item.unit;
-            if (!inventory[key]) {
-              inventory[key] = {
-                name: item.name,
-                unit: item.unit,
-                quantity: 0,
-                value: 0
-              };
-            }
-            if (isImport) {
-              inventory[key].quantity += item.quantity;
-              inventory[key].value += item.quantity * item.price;
-            } else {
-              inventory[key].quantity -= item.quantity;
-              inventory[key].value -= item.quantity * item.price;
-            }
-          });
+function calculateInventory() {
+  const importBatches = {}; // Lưu các lô hàng nhập theo FIFO
+  const inventory = {}; // Kết quả tồn kho cuối cùng theo FIFO
+
+  // Bước 1: Lấy toàn bộ nhập kho
+  db.ref('imports').once('value').then(importSnap => {
+    importSnap.forEach(importDoc => {
+      const items = importDoc.val().items || [];
+      items.forEach(item => {
+        const key = item.name + '_' + item.unit;
+        if (!importBatches[key]) importBatches[key] = [];
+        importBatches[key].push({ quantity: item.quantity, price: item.price });
+      });
+    });
+
+    // Bước 2: Lấy toàn bộ xuất kho và trừ dần theo FIFO
+    db.ref('exports').once('value').then(exportSnap => {
+      exportSnap.forEach(exportDoc => {
+        const items = exportDoc.val().items || [];
+        items.forEach(item => {
+          const key = item.name + '_' + item.unit;
+          let qtyToDeduct = item.quantity;
+
+          const batches = importBatches[key] || [];
+          for (let i = 0; i < batches.length && qtyToDeduct > 0; i++) {
+            const batch = batches[i];
+            if (batch.quantity <= 0) continue;
+
+            const usedQty = Math.min(batch.quantity, qtyToDeduct);
+            batch.quantity -= usedQty;
+            qtyToDeduct -= usedQty;
+          }
+        });
+      });
+
+      // Bước 3: Tính lại tồn kho từ các batch còn dư
+      for (const key in importBatches) {
+        const [name, unit] = key.split('_');
+        const batches = importBatches[key];
+        const total = batches.reduce((acc, b) => {
+          acc.quantity += b.quantity;
+          acc.value += b.quantity * b.price;
+          return acc;
+        }, { quantity: 0, value: 0 });
+
+        if (total.quantity > 0) {
+          inventory[key] = { name, unit, ...total };
         }
-        // Lấy dữ liệu từ Firebase
-        db.ref('imports').once('value').then(importSnap => {
-          importSnap.forEach(importDoc => {
-            addItems(importDoc.val().items || [], true);
-          });
-          db.ref('exports').once('value').then(exportSnap => {
-            exportSnap.forEach(exportDoc => {
-              addItems(exportDoc.val().items || [], false);
-            });
-            // ✅ In kết quả tồn kho
-            const result = Object.values(inventory).filter(i => i.quantity > 0);
-            console.log("Tồn kho hiện tại:");
-            result.forEach(i => {
-              console.log(`${i.name} - ${i.quantity} ${i.unit} ~ ${i.value.toLocaleString()} đ`);
-            });
-            // Hoặc render ra DOM
-            const tableBody = $('#inventoryTable');
-            tableBody.empty();
-            result.forEach((i, index) => {
-              tableBody.append(`
+      }
+
+      // Bước 4: Hiển thị kết quả tồn kho
+      const tableBody = $('#inventoryTable');
+      tableBody.empty();
+
+      Object.values(inventory).forEach((i, index) => {
+        tableBody.append(`
           <tr>
             <td class="border px-2 py-1 text-center">${index + 1}</td>
             <td class="border px-2 py-1">${i.name}</td>
@@ -610,10 +624,13 @@
             <td class="border px-2 py-1 text-right">${i.value.toLocaleString()} đ</td>
           </tr>
         `);
-            });
-          });
-        });
-      }
+      });
+
+      console.log("✅ Tồn kho tính theo giá vốn thực tế (FIFO):", inventory);
+    });
+  });
+}
+
 
       function calculateCashBySource() {
         const sources = {
