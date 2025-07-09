@@ -183,8 +183,8 @@
       <div class="grid grid-cols-5 gap-2">
         <input placeholder="Tên hàng" class="border p-1 rounded" />
         <select class="border p-1 rounded">
-          <option value="kg">kg</option>
-          <option value="cái">cái</option>
+          <option value="kg">Kg</option>
+          <option value="cái">Cái</option>
         </select>
         <input type="number" placeholder="Số lượng" class="border p-1 rounded" />
         <input type="number" placeholder="Đơn giá" class="border p-1 rounded" />
@@ -242,6 +242,13 @@
     return items;
   }
 
+        function getNextId(type, prefix) {
+    return db.ref(type).once("value").then(snap => {
+      const count = snap.numChildren() + 1;
+      return prefix + String(count).padStart(6, '0');
+    });
+  }
+
       window.saveImport = function () {
         const name = $('#customerName').val() || 'Không cung cấp thông tin';
         const address = $('#address').val() || 'Không cung cấp thông tin';
@@ -250,7 +257,7 @@
         const items = getValidItems('importItems');
         const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
         const date = new Date().toISOString();
-        const id = currentEditId || db.ref().child('imports').push().key;
+        const id = currentEditId || await getNextId('imports', 'PNK');
         const data = { id, name, address, cccd, phone, items, total, date };
         db.ref('imports/' + id).set(data).then(() => {
           alert('Đã lưu nhập kho');
@@ -265,7 +272,7 @@
         const items = getValidItems('exportItems');
         const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
         const date = new Date().toISOString();
-        const id = currentEditId || db.ref().child('exports').push().key;
+        const id = currentEditId || await getNextId('exports', 'PXK');
         const data = { id, name, phone, items, total, date };
         db.ref('exports/' + id).set(data).then(() => {
           alert('Đã lưu xuất kho');
@@ -385,7 +392,7 @@
         const content = $('#incomeContent').val() || '';
         const note = $('#incomeNote').val() || '';
         const date = new Date().toISOString();
-        const id = currentEditId || db.ref().child('cashflow').push().key;
+        const id = currentEditId || await getNextId('cashflow', 'PT');
         const data = {
           id,
           type: 'thu',
@@ -409,7 +416,7 @@
         const source = $('#expenseSource').val() || '';
         const note = $('#expenseNote').val() || '';
         const date = new Date().toISOString();
-        const id = currentEditId || db.ref().child('cashflow').push().key;
+        const id = currentEditId || await getNextId('cashflow', 'PC');
         const data = {
           id,
           type: 'chi',
