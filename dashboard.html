@@ -178,8 +178,8 @@
         $("#importForm, #exportForm, #incomeForm, #expenseForm").addClass("hidden");
         if (id) $("#" + id).removeClass("hidden");
       };
-window.addItem = function (containerId) {
-  const itemHtml = `
+      window.addItem = function(containerId) {
+        const itemHtml = `
     <div class="grid grid-cols-5 gap-2">
       <input placeholder="Tên hàng" class="border p-1 rounded" />
       <select class="border p-1 rounded">
@@ -190,36 +190,32 @@ window.addItem = function (containerId) {
       <input type="number" placeholder="Đơn giá" class="border p-1 rounded price" />
       <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
     </div>`;
-  $("#" + containerId).append(itemHtml);
-
-  // Gắn lại sự kiện cho các input mới
-  bindItemEvents(containerId);
-};
+        $("#" + containerId).append(itemHtml);
+        // Gắn lại sự kiện cho các input mới
+        bindItemEvents(containerId);
+      };
 
       function bindItemEvents(containerId) {
-  $(`#${containerId} .qty, #${containerId} .price`).off('input').on('input', function () {
-    const row = $(this).closest('div');
-    const qty = parseFloat(row.find('.qty').val()) || 0;
-    const price = parseFloat(row.find('.price').val()) || 0;
-    const amount = qty * price;
-    row.find('input:eq(4)').val(amount.toLocaleString());
+        $(`#${containerId} .qty, #${containerId} .price`).off('input').on('input', function() {
+          const row = $(this).closest('div');
+          const qty = parseFloat(row.find('.qty').val()) || 0;
+          const price = parseFloat(row.find('.price').val()) || 0;
+          const amount = qty * price;
+          row.find('input:eq(4)').val(amount.toLocaleString());
+          updateTotal(containerId);
+        });
+      }
 
-    updateTotal(containerId);
-  });
-}
-
-
-function updateTotal(containerId) {
-  let total = 0;
-  $(`#${containerId} > div`).each(function () {
-    const qty = parseFloat($(this).find('.qty').val()) || 0;
-    const price = parseFloat($(this).find('.price').val()) || 0;
-    total += qty * price;
-  });
-  const totalId = containerId === 'importItems' ? 'importTotal' : 'exportTotal';
-  $(`#${totalId}`).text(total.toLocaleString());
-}
-
+      function updateTotal(containerId) {
+        let total = 0;
+        $(`#${containerId} > div`).each(function() {
+          const qty = parseFloat($(this).find('.qty').val()) || 0;
+          const price = parseFloat($(this).find('.price').val()) || 0;
+          total += qty * price;
+        });
+        const totalId = containerId === 'importItems' ? 'importTotal' : 'exportTotal';
+        $(`#${totalId}`).text(total.toLocaleString());
+      }
 
       function fillItems(containerId, items) {
         const container = $("#" + containerId);
@@ -266,59 +262,51 @@ function updateTotal(containerId) {
           return prefix + String(count).padStart(6, '0');
         });
       }
-window.saveImport = async function() {
-  const name = $('#customerName').val() || 'Không cung cấp thông tin';
-  const address = $('#address').val() || 'Không cung cấp thông tin';
-  const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
-  const phone = $('#phone').val() || 'Không cung cấp thông tin';
-  const date = new Date().toISOString();
-
-  const items = [];
-
-  // Truy xuất từng hàng trong form nhập hàng
-  $('#importItems > div').each(function () {
-    const name = $(this).find('input:eq(0)').val().trim();
-    const unit = $(this).find('select').val();
-    const quantity = parseFloat($(this).find('input:eq(2)').val()) || 0;
-    const price = parseFloat($(this).find('input:eq(3)').val()) || 0;
-
-    if (name && unit && quantity && price) {
-      items.push({
-        name,
-        unit,
-        quantity,
-        price
-      });
-    }
-  });
-
-  if (items.length === 0) {
-    alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
-    return;
-  }
-
-  const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-  const id = currentEditId || await getNextId('imports', 'PNK');
-
-  const data = {
-    id,
-    name,
-    address,
-    cccd,
-    phone,
-    items,
-    total,
-    date
-  };
-
-  db.ref('imports/' + id).set(data).then(() => {
-    alert('Đã lưu nhập kho');
-    toggleForm(null);
-    currentEditId = null;
-    loadTable("imports", "importTable");
-  });
-};
-
+      window.saveImport = async function() {
+        const name = $('#customerName').val() || 'Không cung cấp thông tin';
+        const address = $('#address').val() || 'Không cung cấp thông tin';
+        const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
+        const phone = $('#phone').val() || 'Không cung cấp thông tin';
+        const date = new Date().toISOString();
+        const items = [];
+        // Truy xuất từng hàng trong form nhập hàng
+        $('#importItems > div').each(function() {
+          const name = $(this).find('input:eq(0)').val().trim();
+          const unit = $(this).find('select').val();
+          const quantity = parseFloat($(this).find('input:eq(2)').val()) || 0;
+          const price = parseFloat($(this).find('input:eq(3)').val()) || 0;
+          if (name && unit && quantity && price) {
+            items.push({
+              name,
+              unit,
+              quantity,
+              price
+            });
+          }
+        });
+        if (items.length === 0) {
+          alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
+          return;
+        }
+        const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+        const id = currentEditId || await getNextId('imports', 'PNK');
+        const data = {
+          id,
+          name,
+          address,
+          cccd,
+          phone,
+          items,
+          total,
+          date
+        };
+        db.ref('imports/' + id).set(data).then(() => {
+          alert('Đã lưu nhập kho');
+          toggleForm(null);
+          currentEditId = null;
+          loadTable("imports", "importTable");
+        });
+      };
       window.saveExport = async function() {
         const name = $('#receiverName').val() || 'Không cung cấp thông tin';
         const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
