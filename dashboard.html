@@ -187,7 +187,7 @@
 
     window.toggleForm = function (id) {
       $("#importForm, #exportForm, #incomeForm, #expenseForm").addClass("hidden");
-      $("#" + id).removeClass("hidden");
+      if (id) $("#" + id).removeClass("hidden");
     };
 
     window.addItem = function (containerId) {
@@ -235,64 +235,90 @@
       return items;
     }
 
-    window.saveIncome = function () {
-      const id = $('#cashflowId').val();
-      const data = {
-        type: 'thu',
-        amount: parseFloat($('#incomeAmount').val()) || 0,
-        sender: $('#incomeSender').val() || '',
-        source: $('#incomeSource').val() || '',
-        content: $('#incomeContent').val() || '',
-        note: $('#incomeNote').val() || '',
-        date: new Date().toISOString()
-      };
-      const ref = id ? db.ref('cashflow/' + id) : db.ref('cashflow').push();
-      ref.set(data).then(() => {
-        loadCashflow();
-        $('#incomeForm input, #incomeForm textarea, #incomeForm select').val('');
-        $('#cashflowId').val('');
-        toggleForm('');
+    function loadTable(type, tableId) {
+      const tbody = $("#" + tableId);
+      db.ref(type).on("value", snap => {
+        tbody.empty();
+        let index = 1;
+        snap.forEach(child => {
+          const d = child.val();
+          const row = `
+            <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "${type}")'>
+              <td class="border px-2 py-1">${index++}</td>
+              <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
+              <td class="border px-2 py-1">${d.name}</td>
+              <td class="border px-2 py-1 text-center">${d.items?.length || 0}</td>
+              <td class="border px-2 py-1 text-right">${Number(d.total || d.amount || 0).toLocaleString()}</td>
+            </tr>
+          `;
+          tbody.append(row);
+        });
       });
     }
 
-    window.saveExpense = function () {
-      const id = $('#cashflowId').val();
-      const data = {
-        type: 'chi',
-        amount: parseFloat($('#expenseAmount').val()) || 0,
-        content: $('#expenseContent').val() || '',
-        source: $('#expenseSource').val() || '',
-        note: $('#expenseNote').val() || '',
-        date: new Date().toISOString()
-      };
-      const ref = id ? db.ref('cashflow/' + id) : db.ref('cashflow').push();
-      ref.set(data).then(() => {
-        loadCashflow();
-        $('#expenseForm input, #expenseForm textarea, #expenseForm select').val('');
-        $('#cashflowId').val('');
-        toggleForm('');
-      });
+    window.showModal = function (data, type) {
+      currentModalData = data;
+      currentModalType = type;
+      let lines = [`Mã phiếu: ${data.id || ''}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name || data.sender || ''}`, `Tổng tiền: ${(data.total || data.amount || 0).toLocaleString()} đ`];
+      if (data.items) {
+        lines.push("--- Mặt hàng ---");
+        data.items.forEach((i, idx) => {
+          lines.push(`${idx + 1}. ${i.name} - ${i.quantity} ${i.unit} x ${i.price} = ${(i.quantity * i.price).toLocaleString()} đ`);
+        });
+      } else {
+        if (data.content) lines.push(`Nội dung: ${data.content}`);
+        if (data.source) lines.push(`Nguồn: ${data.source}`);
+        if (data.note) lines.push(`Ghi chú: ${data.note}`);
+      }
+      $('#modalTitle').text(`Chi tiết ${data.id || ''}`);
+      $('#modalContent').text(lines.join("\n"));
+      $('#modalEditBtn').off().on('click', () => editRecord(data, type));
+      $('#modalDeleteBtn').off().on('click', () => deleteRecord(data.id, type));
+      $('#detailModal').removeClass('hidden');
     }
 
-    window.showCashflowModal = function (id) {
-      db.ref('cashflow/' + id).once('value').then(snap => {
-        const d = snap.val();
-        currentModalData = d;
-        currentEditId = id;
-        const lines = [
-          `Loại phiếu: ${d.type === 'thu' ? 'Thu' : 'Chi'}`,
-          `Ngày: ${new Date(d.date).toLocaleDateString()}`,
-          `Số tiền: ${Number(d.amount).toLocaleString()} đ`,
-          d.type === 'thu' ? `Người gửi: ${d.sender}` : `Nội dung: ${d.content}`,
-          `Nguồn: ${d.source}`,
-          `Ghi chú: ${d.note}`
-        ];
-        $('#modalTitle').text(`Chi tiết phiếu ${d.type === 'thu' ? 'thu' : 'chi'}`);
-        $('#modalContent').text(lines.join("\n"));
-        $('#modalEditBtn').off().on('click', () => editCashflow(id));
-        $('#modalDeleteBtn').off().on('click', () => deleteCashflow(id));
-        $('#detailModal').removeClass('hidden');
-      });
+    function editRecord(data, type) {
+      currentEditId = data.id;
+      currentEditType = type;
+      if (type === 'imports') {
+        $('#customerName').val(data.name);
+        $('#address').val(data.address);
+        $('#cccd').val(data.cccd);
+        $('#phone').val(data.phone);
+        fillItems('importItems', data.items);
+        toggleForm('importForm');
+      } else if (type === 'exports') {
+        $('#receiverName').val(data.name);
+        $('#receiverPhone').val(data.phone);
+        fillItems('exportItems', data.items);
+        toggleForm('exportForm');
+      } else if (type === 'cashflow') {
+        if (data.type === 'thu') {
+          $('#incomeAmount').val(data.amount);
+          $('#incomeSender').val(data.sender);
+          $('#incomeSource').val(data.source);
+          $('#incomeContent').val(data.content);
+          $('#incomeNote').val(data.note);
+          toggleForm('incomeForm');
+        } else {
+          $('#expenseAmount').val(data.amount);
+          $('#expenseContent').val(data.content);
+          $('#expenseSource').val(data.source);
+          $('#expenseNote').val(data.note);
+          toggleForm('expenseForm');
+        }
+      }
+      closeModal();
+    }
+
+    function deleteRecord(id, type) {
+      if (!id) return;
+      if (confirm("Bạn có chắc muốn xoá phiếu này không?")) {
+        db.ref(`${type}/${id}`).remove().then(() => {
+          alert("Đã xoá phiếu thành công!");
+          closeModal();
+        });
+      }
     }
 
     window.closeModal = function () {
@@ -301,61 +327,28 @@
       $('#detailModal').addClass('hidden');
     }
 
-    window.editCashflow = function (id) {
-      db.ref('cashflow/' + id).once('value').then(snap => {
-        const d = snap.val();
-        $('#cashflowId').val(id);
-        if (d.type === 'thu') {
-          $('#incomeAmount').val(d.amount);
-          $('#incomeSender').val(d.sender);
-          $('#incomeSource').val(d.source);
-          $('#incomeContent').val(d.content);
-          $('#incomeNote').val(d.note);
-          toggleForm('incomeForm');
-        } else {
-          $('#expenseAmount').val(d.amount);
-          $('#expenseContent').val(d.content);
-          $('#expenseSource').val(d.source);
-          $('#expenseNote').val(d.note);
-          toggleForm('expenseForm');
-        }
-        closeModal();
-      });
-    }
-
-    window.deleteCashflow = function (id) {
-      if (confirm("Bạn có chắc muốn xoá phiếu này không?")) {
-        db.ref('cashflow/' + id).remove().then(() => {
-          alert("Đã xoá phiếu thành công!");
-          closeModal();
-          loadCashflow();
-        });
-      }
-    }
-
     function loadCashflow() {
       const tbody = $('#incomeExpenseTable');
       tbody.empty();
       db.ref('cashflow').orderByChild('date').once('value', snap => {
         snap.forEach(child => {
           const d = child.val();
-          const id = child.key;
           const row = `
-            <tr class="cursor-pointer hover:bg-gray-100" onclick="showCashflowModal('${id}')">
+            <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "cashflow")'>
               <td class="border px-2 py-1 text-center">${d.type === 'thu' ? 'Thu' : 'Chi'}</td>
               <td class="border px-2 py-1 text-center">${new Date(d.date).toLocaleString()}</td>
               <td class="border px-2 py-1 text-right">${Number(d.amount).toLocaleString()}</td>
-              <td class="border px-2 py-1">${d.type === 'thu' ? d.sender : d.content}</td>
-              <td class="border px-2 py-1 text-center">${d.source}</td>
-              <td class="border px-2 py-1">${d.note}</td>
-            </tr>
-          `;
+              <td class="border px-2 py-1">${d.sender || d.content}</td>
+              <td class="border px-2 py-1 text-center">${d.source || ''}</td>
+              <td class="border px-2 py-1">${d.note || ''}</td>
+            </tr>`;
           tbody.append(row);
         });
       });
     }
   });
 </script>
+
 
 
 
