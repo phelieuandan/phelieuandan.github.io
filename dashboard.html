@@ -8,6 +8,8 @@
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database-compat.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </head>
 <body class="bg-gray-100 p-6">
   <div class="max-w-6xl mx-auto bg-white shadow rounded-lg p-6">
@@ -150,10 +152,6 @@
       </div>
     </div>
 
-
-
-
-  
 <script>
   const firebaseConfig = {
     apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
@@ -165,258 +163,208 @@
     appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e"
   };
   firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-  const db = firebase.database();
 
-  let currentModalData = null;
-  let currentModalType = null;
-  let currentEditId = null;
-  let currentEditType = null;
+  $(document).ready(function () {
+    const auth = firebase.auth();
+    const db = firebase.database();
 
-  auth.onAuthStateChanged(user => {
-    if (!user) return location.href = "index.html";
-    document.getElementById("userName").innerText = user.email;
-    loadTable("imports", "importTable");
-    loadTable("exports", "exportTable");
-  });
+    let currentModalData = null;
+    let currentModalType = null;
+    let currentEditId = null;
+    let currentEditType = null;
 
-  function logout() {
-    auth.signOut().then(() => location.href = "index.html");
-  }
-
-  function toggleForm(id) {
-    document.getElementById("importForm").classList.add("hidden");
-    document.getElementById("exportForm").classList.add("hidden");
-    document.getElementById(id).classList.remove("hidden");
-  }
-
-  function addItem(containerId) {
-    const div = document.createElement("div");
-    div.className = "grid grid-cols-5 gap-2";
-    div.innerHTML = `
-      <input placeholder="Tên hàng" class="border p-1 rounded" />
-      <select class="border p-1 rounded">
-        <option value="kg">kg</option>
-        <option value="cái">cái</option>
-      </select>
-      <input type="number" placeholder="Số lượng" class="border p-1 rounded" />
-      <input type="number" placeholder="Đơn giá" class="border p-1 rounded" />
-      <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
-    `;
-    document.getElementById(containerId).appendChild(div);
-
-    div.querySelectorAll("input, select").forEach(input => {
-      input.addEventListener("input", () => updateTotal(containerId));
+    auth.onAuthStateChanged(user => {
+      if (!user) return location.href = "index.html";
+      $("#userName").text(user.email);
+      loadTable("imports", "importTable");
+      loadTable("exports", "exportTable");
+      loadCashflow();
     });
-  }
 
-  function updateTotal(containerId) {
-    let total = 0;
-    document.querySelectorAll(`#${containerId} > div`).forEach(row => {
-      const qty = parseFloat(row.children[2].value) || 0;
-      const price = parseFloat(row.children[3].value) || 0;
-      const amt = qty * price;
-      row.children[4].value = amt.toLocaleString();
-      total += amt;
-    });
-    document.getElementById(containerId === "importItems" ? "importTotal" : "exportTotal").innerText = total.toLocaleString();
-  }
+    window.logout = function () {
+      auth.signOut().then(() => location.href = "index.html");
+    };
 
-  function getValidItems(containerId) {
-    const items = [];
-    document.querySelectorAll(`#${containerId} > div`).forEach(row => {
-      const [name, unit, qty, price] = Array.from(row.children).map(e => e.value);
-      if (name && unit && qty && price) {
-        items.push({ name, unit, quantity: +qty, price: +price });
-      }
-    });
-    return items;
-  }
+    window.toggleForm = function (id) {
+      $("#importForm, #exportForm, #incomeForm, #expenseForm").addClass("hidden");
+      $("#" + id).removeClass("hidden");
+    };
 
-  function saveImport() {
-    const name = document.getElementById("customerName").value || "Không cung cấp";
-    const address = document.getElementById("address").value || "Không cung cấp";
-    const cccd = document.getElementById("cccd").value || "Không cung cấp";
-    const phone = document.getElementById("phone").value || "Không cung cấp";
-    const items = getValidItems("importItems");
-    if (!items.length) return alert("Chưa có mặt hàng hợp lệ!");
-    saveRecord("imports", { name, address, cccd, phone, items });
-  }
-
-  function saveExport() {
-    const name = document.getElementById("receiverName").value || "Không cung cấp";
-    const phone = document.getElementById("receiverPhone").value || "Không cung cấp";
-    const items = getValidItems("exportItems");
-    if (!items.length) return alert("Chưa có mặt hàng hợp lệ!");
-    saveRecord("exports", { name, phone, items });
-  }
-
-  function saveRecord(type, data) {
-    const total = data.items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-    const now = new Date().toISOString();
-
-    if (currentEditId && currentEditType === type) {
-      db.ref(`${type}/${currentEditId}`).update({ ...data, total, date: now }).then(() => {
-        alert("Đã cập nhật phiếu thành công!");
-        currentEditId = null;
-        currentEditType = null;
-        location.reload();
-      });
-    } else {
-      db.ref(type).once("value").then(snap => {
-        const count = snap.numChildren() + 1;
-        const id = (type === "imports" ? "PNK" : "PXK") + String(count).padStart(3, "0");
-        db.ref(`${type}/${id}`).set({ id, date: now, ...data, total }).then(() => location.reload());
-      });
-    }
-  }
-
-  function loadTable(type, tableId) {
-    const tbody = document.getElementById(tableId);
-    db.ref(type).on("value", snap => {
-      tbody.innerHTML = "";
-      let index = 1;
-      snap.forEach(child => {
-        const d = child.val();
-        const tr = document.createElement("tr");
-        tr.className = "cursor-pointer hover:bg-gray-100";
-        tr.onclick = () => showModal(d, type);
-        tr.innerHTML = `
-          <td class="border px-2 py-1">${index++}</td>
-          <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
-          <td class="border px-2 py-1">${d.name}</td>
-          <td class="border px-2 py-1 text-center">${d.items.length}</td>
-          <td class="border px-2 py-1 text-right">${Number(d.total).toLocaleString()}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-    });
-  }
-
-  function showModal(data, type) {
-    currentModalData = data;
-    currentModalType = type;
-    const lines = [`Mã phiếu: ${data.id}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name}`, `Tổng tiền: ${Number(data.total).toLocaleString()} đ`, "--- Mặt hàng ---"];
-    data.items.forEach((i, idx) => {
-      lines.push(`${idx + 1}. ${i.name} - ${i.quantity} ${i.unit} x ${i.price} = ${(i.quantity * i.price).toLocaleString()} đ`);
-    });
-    document.getElementById("modalTitle").innerText = `Chi tiết ${data.id}`;
-    document.getElementById("modalContent").innerText = lines.join("\n");
-    document.getElementById("detailModal").classList.remove("hidden");
-  }
-
-  document.getElementById("editBtn").onclick = () => {
-    if (!currentModalData || !currentModalType) return;
-    const formId = currentModalType === "imports" ? "importForm" : "exportForm";
-    toggleForm(formId);
-    currentEditId = currentModalData.id;
-    currentEditType = currentModalType;
-
-    if (currentModalType === "imports") {
-      document.getElementById("customerName").value = currentModalData.name;
-      document.getElementById("address").value = currentModalData.address || "";
-      document.getElementById("cccd").value = currentModalData.cccd || "";
-      document.getElementById("phone").value = currentModalData.phone || "";
-      fillItems("importItems", currentModalData.items);
-    } else {
-      document.getElementById("receiverName").value = currentModalData.name;
-      document.getElementById("receiverPhone").value = currentModalData.phone || "";
-      fillItems("exportItems", currentModalData.items);
-    }
-
-    closeModal();
-  };
-
-  document.getElementById("deleteBtn").onclick = () => {
-    if (!currentModalData || !currentModalType) return;
-    if (confirm("Bạn có chắc chắn muốn xoá phiếu này không?")) {
-      db.ref(`${currentModalType}/${currentModalData.id}`).remove().then(() => {
-        alert("Đã xoá thành công!");
-        closeModal();
-      });
-    }
-  };
-
-  function fillItems(containerId, items) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = "";
-    items.forEach(item => {
-      const div = document.createElement("div");
-      div.className = "grid grid-cols-5 gap-2";
-      div.innerHTML = `
-        <input value="${item.name}" class="border p-1 rounded" />
-        <select class="border p-1 rounded">
-          <option value="kg" ${item.unit === "kg" ? "selected" : ""}>kg</option>
-          <option value="cái" ${item.unit === "cái" ? "selected" : ""}>cái</option>
-        </select>
-        <input type="number" value="${item.quantity}" class="border p-1 rounded" />
-        <input type="number" value="${item.price}" class="border p-1 rounded" />
-        <input value="${(item.quantity * item.price).toLocaleString()}" class="border p-1 rounded bg-gray-100" readonly />
+    window.addItem = function (containerId) {
+      const itemHtml = `
+        <div class="grid grid-cols-5 gap-2">
+          <input placeholder="Tên hàng" class="border p-1 rounded" />
+          <select class="border p-1 rounded">
+            <option value="kg">kg</option>
+            <option value="cái">cái</option>
+          </select>
+          <input type="number" placeholder="Số lượng" class="border p-1 rounded" />
+          <input type="number" placeholder="Đơn giá" class="border p-1 rounded" />
+          <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
+        </div>
       `;
-      container.appendChild(div);
-      div.querySelectorAll("input, select").forEach(input => {
-        input.addEventListener("input", () => updateTotal(containerId));
+      $("#" + containerId).append(itemHtml);
+      $("#" + containerId + " input, select").off("input").on("input", function () {
+        updateTotal(containerId);
       });
-    });
-    updateTotal(containerId);
-  }
-
-  function closeModal() {
-    currentModalData = null;
-    document.getElementById("detailModal").classList.add("hidden");
-  }
-
-  function saveIncome() {
-    const data = {
-      type: 'thu',
-      amount: parseFloat(document.getElementById('incomeAmount').value || 0),
-      sender: document.getElementById('incomeSender').value || '',
-      source: document.getElementById('incomeSource').value || '',
-      content: document.getElementById('incomeContent').value || '',
-      note: document.getElementById('incomeNote').value || '',
-      date: new Date().toISOString()
     };
-    firebase.database().ref('cashflow').push(data).then(() => loadCashflow());
-  }
 
-  function saveExpense() {
-    const data = {
-      type: 'chi',
-      amount: parseFloat(document.getElementById('expenseAmount').value || 0),
-      content: document.getElementById('expenseContent').value || '',
-      source: document.getElementById('expenseSource').value || '',
-      note: document.getElementById('expenseNote').value || '',
-      date: new Date().toISOString()
-    };
-    firebase.database().ref('cashflow').push(data).then(() => loadCashflow());
-  }
-
-  function loadCashflow() {
-    const tbody = document.getElementById('incomeExpenseTable');
-    tbody.innerHTML = '';
-    firebase.database().ref('cashflow').orderByChild('date').once('value', snap => {
-      snap.forEach(child => {
-        const d = child.val();
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td class="border px-2 py-1 text-center">${d.type === 'thu' ? 'Thu' : 'Chi'}</td>
-          <td class="border px-2 py-1 text-center">${new Date(d.date).toLocaleString()}</td>
-          <td class="border px-2 py-1 text-right">${d.amount.toLocaleString()}</td>
-          <td class="border px-2 py-1">${d.type === 'thu' ? d.sender : d.content}</td>
-          <td class="border px-2 py-1 text-center">${d.source}</td>
-          <td class="border px-2 py-1">${d.note}</td>
-        `;
-        tbody.appendChild(tr);
+    function updateTotal(containerId) {
+      let total = 0;
+      $(`#${containerId} > div`).each(function () {
+        const qty = parseFloat($(this).find("input:eq(2)").val()) || 0;
+        const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
+        const amt = qty * price;
+        $(this).find("input:eq(4)").val(amt.toLocaleString());
+        total += amt;
       });
-    });
-  }
+      $("#" + (containerId === "importItems" ? "importTotal" : "exportTotal")).text(total.toLocaleString());
+    }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    loadCashflow();
+    function getValidItems(containerId) {
+      const items = [];
+      $(`#${containerId} > div`).each(function () {
+        const name = $(this).find("input:eq(0)").val();
+        const unit = $(this).find("select").val();
+        const qty = parseFloat($(this).find("input:eq(2)").val()) || 0;
+        const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
+        if (name && unit && qty && price) {
+          items.push({ name, unit, quantity: qty, price });
+        }
+      });
+      return items;
+    }
+
+    window.saveImport = function () {
+      const name = $("#customerName").val() || "Không cung cấp";
+      const address = $("#address").val() || "Không cung cấp";
+      const cccd = $("#cccd").val() || "Không cung cấp";
+      const phone = $("#phone").val() || "Không cung cấp";
+      const items = getValidItems("importItems");
+      if (!items.length) return alert("Chưa có mặt hàng hợp lệ!");
+      saveRecord("imports", { name, address, cccd, phone, items });
+    }
+
+    window.saveExport = function () {
+      const name = $("#receiverName").val() || "Không cung cấp";
+      const phone = $("#receiverPhone").val() || "Không cung cấp";
+      const items = getValidItems("exportItems");
+      if (!items.length) return alert("Chưa có mặt hàng hợp lệ!");
+      saveRecord("exports", { name, phone, items });
+    }
+
+    function saveRecord(type, data) {
+      const total = data.items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+      const now = new Date().toISOString();
+
+      if (currentEditId && currentEditType === type) {
+        db.ref(`${type}/${currentEditId}`).update({ ...data, total, date: now }).then(() => {
+          alert("Đã cập nhật phiếu thành công!");
+          currentEditId = null;
+          currentEditType = null;
+          location.reload();
+        });
+      } else {
+        db.ref(type).once("value").then(snap => {
+          const count = snap.numChildren() + 1;
+          const id = (type === "imports" ? "PNK" : "PXK") + String(count).padStart(3, "0");
+          db.ref(`${type}/${id}`).set({ id, date: now, ...data, total }).then(() => location.reload());
+        });
+      }
+    }
+
+    function loadTable(type, tableId) {
+      const tbody = $("#" + tableId);
+      db.ref(type).on("value", snap => {
+        tbody.empty();
+        let index = 1;
+        snap.forEach(child => {
+          const d = child.val();
+          const row = `
+            <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "${type}")'>
+              <td class="border px-2 py-1">${index++}</td>
+              <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
+              <td class="border px-2 py-1">${d.name}</td>
+              <td class="border px-2 py-1 text-center">${d.items.length}</td>
+              <td class="border px-2 py-1 text-right">${Number(d.total).toLocaleString()}</td>
+            </tr>
+          `;
+          tbody.append(row);
+        });
+      });
+    }
+
+    window.showModal = function (data, type) {
+      currentModalData = data;
+      currentModalType = type;
+      const lines = [`Mã phiếu: ${data.id}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name}`, `Tổng tiền: ${Number(data.total).toLocaleString()} đ`, "--- Mặt hàng ---"];
+      data.items.forEach((i, idx) => {
+        lines.push(`${idx + 1}. ${i.name} - ${i.quantity} ${i.unit} x ${i.price} = ${(i.quantity * i.price).toLocaleString()} đ`);
+      });
+      $("#modalTitle").text(`Chi tiết ${data.id}`);
+      $("#modalContent").text(lines.join("\n"));
+      $("#detailModal").removeClass("hidden");
+    }
+
+    window.closeModal = function () {
+      currentModalData = null;
+      $("#detailModal").addClass("hidden");
+    }
+
+    window.saveIncome = function () {
+      const data = {
+        type: 'thu',
+        amount: parseFloat($('#incomeAmount').val()) || 0,
+        sender: $('#incomeSender').val() || '',
+        source: $('#incomeSource').val() || '',
+        content: $('#incomeContent').val() || '',
+        note: $('#incomeNote').val() || '',
+        date: new Date().toISOString()
+      };
+      db.ref('cashflow').push(data).then(() => {
+        loadCashflow();
+        $('#incomeForm input, #incomeForm textarea, #incomeForm select').val('');
+      });
+    }
+
+    window.saveExpense = function () {
+      const data = {
+        type: 'chi',
+        amount: parseFloat($('#expenseAmount').val()) || 0,
+        content: $('#expenseContent').val() || '',
+        source: $('#expenseSource').val() || '',
+        note: $('#expenseNote').val() || '',
+        date: new Date().toISOString()
+      };
+      db.ref('cashflow').push(data).then(() => {
+        loadCashflow();
+        $('#expenseForm input, #expenseForm textarea, #expenseForm select').val('');
+      });
+    }
+
+    function loadCashflow() {
+      const tbody = $('#incomeExpenseTable');
+      tbody.empty();
+      db.ref('cashflow').orderByChild('date').once('value', snap => {
+        snap.forEach(child => {
+          const d = child.val();
+          const row = `
+            <tr>
+              <td class="border px-2 py-1 text-center">${d.type === 'thu' ? 'Thu' : 'Chi'}</td>
+              <td class="border px-2 py-1 text-center">${new Date(d.date).toLocaleString()}</td>
+              <td class="border px-2 py-1 text-right">${Number(d.amount).toLocaleString()}</td>
+              <td class="border px-2 py-1">${d.type === 'thu' ? d.sender : d.content}</td>
+              <td class="border px-2 py-1 text-center">${d.source}</td>
+              <td class="border px-2 py-1">${d.note}</td>
+            </tr>
+          `;
+          tbody.append(row);
+        });
+      });
+    }
   });
-
-  
 </script>
+
 
 
   
