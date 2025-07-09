@@ -482,37 +482,45 @@
         $('#detailModal').removeClass('hidden');
       };
 
-      function editRecord(data, type) {
-        if (type === 'imports') {
-          $('#customerName').val(data.name);
-          $('#address').val(data.address);
-          $('#cccd').val(data.cccd);
-          $('#phone').val(data.phone);
-          fillItems('importItems', data.items);
-          toggleForm('importForm');
-        } else if (type === 'exports') {
-          $('#receiverName').val(data.name);
-          $('#receiverPhone').val(data.phone);
-          fillItems('exportItems', data.items);
-          toggleForm('exportForm');
-        } else if (type === 'cashflow') {
-          if (data.type === 'thu') {
-            $('#incomeAmount').val(data.amount);
-            $('#incomeSender').val(data.sender);
-            $('#incomeSource').val(data.source);
-            $('#incomeContent').val(data.content);
-            $('#incomeNote').val(data.note);
-            toggleForm('incomeForm');
-          } else {
-            $('#expenseAmount').val(data.amount);
-            $('#expenseContent').val(data.content);
-            $('#expenseSource').val(data.source);
-            $('#expenseNote').val(data.note);
-            toggleForm('expenseForm');
-          }
-        }
-        closeModal();
-      }
+function editRecord(data, type) {
+  if (type === 'imports') {
+    $('#customerName').val(data.name);
+    $('#address').val(data.address);
+    $('#cccd').val(data.cccd);
+    $('#phone').val(data.phone);
+    fillItems('importItems', data.items);
+    toggleForm('importForm');
+
+  } else if (type === 'exports') {
+    $('#receiverName').val(data.name);
+    $('#receiverPhone').val(data.phone);
+    fillItems('exportItems', data.items);
+    toggleForm('exportForm');
+
+  } else if (type === 'cashflow') {
+    if (data.type === 'thu') {
+      $('#incomeAmount').val(data.amount);
+      $('#incomeSender').val(data.sender || '');
+      $('#incomeSource').val(data.source || '');
+      $('#incomeContent').val(data.content || '');
+      $('#incomeCategory').val(data.category || '');
+      $('#incomeNote').val(data.note || '');
+      toggleForm('incomeForm');
+
+    } else {
+      $('#expenseAmount').val(data.amount);
+      $('#expenseSender').val(data.sender || '');
+      $('#expenseContent').val(data.content || '');
+      $('#expenseSource').val(data.source || '');
+      $('#expenseCategory').val(data.category || '');
+      $('#expenseNote').val(data.note || '');
+      toggleForm('expenseForm');
+    }
+  }
+
+  closeModal();
+}
+
 
       function deleteRecord(id, type) {
         if (!id) return;
