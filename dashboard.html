@@ -571,7 +571,6 @@
           });
         });
       }
-      calculateInventory();
 
       function calculateCashBySource() {
         const sources = {
@@ -638,9 +637,7 @@
       auth.onAuthStateChanged(user => {
         if (!user) return location.href = "index.html";
         $("#userName").text(user.email);
-        loadTable("imports", "importTable");
-        loadTable("exports", "exportTable");
-        loadCashflow();
+        calculateInventory();
         calculateCashBySource();
         calculateProfitLoss(); // 👈 gọi tính lãi lỗ
       });
