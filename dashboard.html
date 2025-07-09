@@ -262,22 +262,22 @@ window.saveImport = async function() {
 
   const items = [];
 
-  $('#importItems > div').each(function() {
-    const itemName = $(this).find('input:eq(0)').val().trim();
-    const unit = $(this).find('select').val(); // giữ nguyên hoa/thường
-    const quantity = parseFloat($(this).find('input:eq(2)').val()) || 0;
-    const price = parseFloat($(this).find('input:eq(3)').val()) || 0;
+$('#importItems > div').each(function() {
+  const itemName = $(this).find('input:eq(0)').val().trim();
+  const unit = $(this).find('select').val();
+  const quantity = parseFloat($(this).find('.qty').val()) || 0;
+  const price = parseFloat($(this).find('.price').val()) || 0;
 
-    // Chỉ thêm nếu đủ thông tin
-    if (itemName && (unit === 'Kg' || unit === 'Cái') && quantity && price) {
-      items.push({
-        name: itemName,
-        unit: unit,
-        quantity: quantity,
-        price: price
-      });
-    }
-  });
+  if (itemName && unit && quantity && price) {
+    items.push({
+      name: itemName,
+      unit: unit,
+      quantity: quantity,
+      price: price
+    });
+  }
+});
+
 
   if (items.length === 0) {
     alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
