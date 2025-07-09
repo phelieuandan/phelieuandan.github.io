@@ -206,6 +206,8 @@
         });
       }
 
+      bindItemEvents('importItems');
+
       function updateTotal(containerId) {
         let total = 0;
         $(`#${containerId} > div`).each(function() {
