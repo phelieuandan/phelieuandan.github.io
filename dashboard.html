@@ -1,64 +1,85 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Phế Liệu An Dân - Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database-compat.js"></script>
 </head>
 <body class="bg-gray-100 p-6">
-  <div class="max-w-6xl mx-auto bg-white rounded-lg shadow p-6">
+  <div class="max-w-6xl mx-auto bg-white shadow rounded-lg p-6">
+    <!-- Header -->
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-green-600">Welcome, <span id="userName">User</span></h2>
-      <button onclick="logout()" class="text-sm text-red-500 hover:underline">Logout</button>
+      <h2 class="text-xl font-bold text-green-600">Xin chào, <span id="userName">Người dùng</span></h2>
+      <button onclick="logout()" class="text-sm text-red-600 hover:underline">Đăng xuất</button>
     </div>
 
-    <div class="mb-4">
-      <button onclick="showForm()" class="bg-green-600 text-white px-4 py-2 rounded">+ New Import</button>
+    <!-- Buttons -->
+    <div class="flex gap-4 mb-6">
+      <button onclick="toggleForm('importForm')" class="bg-green-600 text-white px-4 py-2 rounded">+ Nhập kho</button>
+      <button onclick="toggleForm('exportForm')" class="bg-yellow-600 text-white px-4 py-2 rounded">+ Xuất kho</button>
     </div>
 
-    <!-- Form nhập kho -->
-    <div id="importForm" class="hidden mb-8 border p-4 rounded bg-gray-50">
-      <h3 class="text-lg font-semibold mb-2">New Import Entry</h3>
+    <!-- Form Nhập Kho -->
+    <div id="importForm" class="hidden border p-4 rounded bg-green-50 mb-6">
+      <h3 class="font-semibold mb-2">Form Nhập Kho</h3>
       <div class="grid grid-cols-2 gap-4 mb-4">
-        <input id="customerName" type="text" placeholder="Customer Name" class="border p-2 rounded w-full" />
-        <input id="address" type="text" placeholder="Address" class="border p-2 rounded w-full" />
-        <input id="idNumber" type="text" placeholder="ID Number" class="border p-2 rounded w-full" />
-        <input id="phone" type="text" placeholder="Phone Number" class="border p-2 rounded w-full" />
+        <input id="customerName" placeholder="Tên khách hàng" class="border p-2 rounded" />
+        <input id="address" placeholder="Địa chỉ" class="border p-2 rounded" />
+        <input id="cccd" placeholder="CCCD" class="border p-2 rounded" />
+        <input id="phone" placeholder="Số điện thoại" class="border p-2 rounded" />
       </div>
-
-      <div id="itemsList" class="space-y-2 mb-4"></div>
-      <button onclick="addItem()" class="bg-blue-500 text-white px-4 py-1 rounded">+ Add Item</button>
-
-      <div class="mt-4 font-bold">Total: <span id="totalAmount">0</span> đ</div>
-      <button onclick="saveImport()" class="mt-4 bg-green-600 text-white px-6 py-2 rounded">Save</button>
+      <div id="importItems" class="space-y-2 mb-2"></div>
+      <button onclick="addItem('importItems')" class="bg-blue-500 text-white px-4 py-1 rounded">+ Thêm mặt hàng</button>
+      <div class="mt-4 font-bold">Tổng tiền: <span id="importTotal">0</span> đ</div>
+      <button onclick="saveImport()" class="mt-2 bg-green-600 text-white px-4 py-2 rounded">Lưu</button>
     </div>
 
-    <!-- Danh sách nhập kho -->
-    <div>
-      <h3 class="text-lg font-semibold mb-2">Import Entries</h3>
-      <table class="w-full border text-sm mb-6">
-        <thead class="bg-gray-200">
-          <tr>
-            <th class="border px-2 py-1">#</th>
-            <th class="border px-2 py-1">Date</th>
-            <th class="border px-2 py-1">Customer</th>
-            <th class="border px-2 py-1 text-center">Items</th>
-            <th class="border px-2 py-1 text-right">Total</th>
-          </tr>
-        </thead>
-        <tbody id="importTable"></tbody>
-      </table>
+    <!-- Form Xuất Kho -->
+    <div id="exportForm" class="hidden border p-4 rounded bg-yellow-50 mb-6">
+      <h3 class="font-semibold mb-2">Form Xuất Kho</h3>
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input id="receiverName" placeholder="Người nhận hàng" class="border p-2 rounded" />
+        <input id="receiverPhone" placeholder="Số điện thoại" class="border p-2 rounded" />
+      </div>
+      <div id="exportItems" class="space-y-2 mb-2"></div>
+      <button onclick="addItem('exportItems')" class="bg-blue-500 text-white px-4 py-1 rounded">+ Thêm mặt hàng</button>
+      <div class="mt-4 font-bold">Tổng tiền: <span id="exportTotal">0</span> đ</div>
+      <button onclick="saveExport()" class="mt-2 bg-yellow-600 text-white px-4 py-2 rounded">Lưu</button>
     </div>
 
-    <!-- Chi tiết phiếu nhập -->
-    <div id="importDetail" class="hidden bg-gray-50 p-4 border rounded">
-      <h3 class="text-lg font-bold mb-2">Import Detail</h3>
-      <div id="detailContent" class="text-sm"></div>
-    </div>
+    <!-- Bảng Nhập kho -->
+    <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Nhập kho</h3>
+    <table class="w-full border text-sm mb-6">
+      <thead class="bg-green-100">
+        <tr>
+          <th class="border px-2 py-1">STT</th>
+          <th class="border px-2 py-1">Ngày</th>
+          <th class="border px-2 py-1">Khách hàng</th>
+          <th class="border px-2 py-1 text-center">Số mặt hàng</th>
+          <th class="border px-2 py-1 text-right">Tổng tiền</th>
+        </tr>
+      </thead>
+      <tbody id="importTable"></tbody>
+    </table>
+
+    <!-- Bảng Xuất kho -->
+    <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Xuất kho</h3>
+    <table class="w-full border text-sm">
+      <thead class="bg-yellow-100">
+        <tr>
+          <th class="border px-2 py-1">STT</th>
+          <th class="border px-2 py-1">Ngày</th>
+          <th class="border px-2 py-1">Người nhận</th>
+          <th class="border px-2 py-1 text-center">Số mặt hàng</th>
+          <th class="border px-2 py-1 text-right">Tổng tiền</th>
+        </tr>
+      </thead>
+      <tbody id="exportTable"></tbody>
+    </table>
   </div>
 
   <script>
@@ -71,142 +92,127 @@
       messagingSenderId: "524439415659",
       appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e"
     };
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
 
     auth.onAuthStateChanged(user => {
-      if (!user) return (window.location.href = "index.html");
-      document.getElementById("userName").innerText = user.displayName || user.email;
-      loadImports();
+      if (!user) return location.href = "index.html";
+      document.getElementById("userName").innerText = user.email;
+      loadTable("imports", "importTable");
+      loadTable("exports", "exportTable");
     });
 
     function logout() {
-      auth.signOut().then(() => (window.location.href = "index.html"));
+      auth.signOut().then(() => location.href = "index.html");
     }
 
-    function showForm() {
-      document.getElementById("importForm").classList.toggle("hidden");
+    function toggleForm(id) {
+      document.getElementById("importForm").classList.add("hidden");
+      document.getElementById("exportForm").classList.add("hidden");
+      document.getElementById(id).classList.remove("hidden");
     }
 
-    function addItem() {
+    function addItem(containerId) {
       const div = document.createElement("div");
       div.className = "grid grid-cols-5 gap-2";
       div.innerHTML = `
-        <input placeholder="Item Name" class="border p-1 rounded" />
+        <input placeholder="Tên hàng" class="border p-1 rounded" />
         <select class="border p-1 rounded">
-          <option value="">Unit</option>
+          <option value="">ĐVT</option>
           <option value="kg">kg</option>
-          <option value="pcs">pcs</option>
+          <option value="cái">cái</option>
         </select>
-        <input type="number" placeholder="Quantity" class="border p-1 rounded" />
-        <input type="number" placeholder="Unit Price" class="border p-1 rounded" />
-        <input placeholder="Amount" class="border p-1 rounded bg-gray-100" readonly />
+        <input type="number" placeholder="Số lượng" class="border p-1 rounded" />
+        <input type="number" placeholder="Đơn giá" class="border p-1 rounded" />
+        <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
       `;
-      document.getElementById("itemsList").appendChild(div);
+      document.getElementById(containerId).appendChild(div);
+
+      div.querySelectorAll("input, select").forEach(input => {
+        input.addEventListener("input", () => updateTotal(containerId));
+      });
     }
 
-    function calculateTotal() {
+    function updateTotal(containerId) {
       let total = 0;
-      document.querySelectorAll("#itemsList > div").forEach(row => {
+      document.querySelectorAll(`#${containerId} > div`).forEach(row => {
         const qty = parseFloat(row.children[2].value) || 0;
         const price = parseFloat(row.children[3].value) || 0;
-        const amount = qty * price;
-        row.children[4].value = amount.toLocaleString();
-        total += amount;
+        const amt = qty * price;
+        row.children[4].value = amt.toLocaleString();
+        total += amt;
       });
-      document.getElementById("totalAmount").innerText = total.toLocaleString();
+      document.getElementById(containerId === "importItems" ? "importTotal" : "exportTotal").innerText = total.toLocaleString();
     }
 
-    document.getElementById("itemsList").addEventListener("input", calculateTotal);
-
     function saveImport() {
-      const name = document.getElementById("customerName").value.trim() || "Unknown";
-      const address = document.getElementById("address").value.trim() || "Not provided";
-      const idNumber = document.getElementById("idNumber").value.trim() || "Not provided";
-      const phone = document.getElementById("phone").value.trim() || "Not provided";
+      const name = document.getElementById("customerName").value || "Không cung cấp";
+      const address = document.getElementById("address").value || "Không cung cấp";
+      const cccd = document.getElementById("cccd").value || "Không cung cấp";
+      const phone = document.getElementById("phone").value || "Không cung cấp";
+      const items = getValidItems("importItems");
+      if (items.length === 0) return alert("Chưa có mặt hàng hợp lệ!");
 
+      saveRecord("imports", { name, address, cccd, phone, items });
+    }
+
+    function saveExport() {
+      const name = document.getElementById("receiverName").value || "Không cung cấp";
+      const phone = document.getElementById("receiverPhone").value || "Không cung cấp";
+      const items = getValidItems("exportItems");
+      if (items.length === 0) return alert("Chưa có mặt hàng hợp lệ!");
+
+      saveRecord("exports", { name, phone, items });
+    }
+
+    function getValidItems(containerId) {
       const items = [];
-      document.querySelectorAll("#itemsList > div").forEach(row => {
-        const itemName = row.children[0].value.trim();
-        const unit = row.children[1].value;
-        const qty = row.children[2].value;
-        const price = row.children[3].value;
-        if (itemName && unit && qty && price) {
-          items.push({
-            name: itemName,
-            unit,
-            quantity: qty,
-            unitPrice: price,
-            amount: (qty * price).toFixed(0)
-          });
+      document.querySelectorAll(`#${containerId} > div`).forEach(row => {
+        const [ten, dvt, sl, dg] = Array.from(row.children).map(e => e.value);
+        if (ten && dvt && sl && dg) {
+          items.push({ name: ten, unit: dvt, quantity: sl, price: dg });
         }
       });
+      return items;
+    }
 
-      if (items.length === 0) return alert("Please enter valid items!");
-
-      db.ref("imports").once("value").then(snapshot => {
-        const count = snapshot.numChildren() + 1;
-        const id = "PNK" + String(count).padStart(3, "0");
-        const data = {
+    function saveRecord(type, data) {
+      db.ref(type).once("value").then(snap => {
+        const count = snap.numChildren() + 1;
+        const id = (type === "imports" ? "PNK" : "PXK") + String(count).padStart(3, "0");
+        const total = data.items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+        db.ref(`${type}/${id}`).set({
           id,
-          customerName: name,
-          address,
-          idNumber,
-          phone,
           date: new Date().toISOString(),
-          items,
-          totalAmount: items.reduce((a, b) => a + parseFloat(b.amount), 0)
-        };
-        db.ref("imports/" + id).set(data).then(() => {
-          alert("Saved successfully!");
+          ...data,
+          total
+        }).then(() => {
+          alert("Đã lưu thành công!");
           location.reload();
         });
       });
     }
 
-    function loadImports() {
-      const tbody = document.getElementById("importTable");
-      db.ref("imports").on("value", snap => {
+    function loadTable(type, tableId) {
+      const tbody = document.getElementById(tableId);
+      db.ref(type).on("value", snap => {
         tbody.innerHTML = "";
-        let stt = 1;
+        let index = 1;
         snap.forEach(child => {
           const d = child.val();
           const tr = document.createElement("tr");
-          tr.classList.add("cursor-pointer", "hover:bg-gray-100");
-          tr.onclick = () => showDetail(d);
           tr.innerHTML = `
-            <td class="border px-2 py-1">${stt++}</td>
+            <td class="border px-2 py-1">${index++}</td>
             <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
-            <td class="border px-2 py-1">${d.customerName}</td>
+            <td class="border px-2 py-1">${d.name}</td>
             <td class="border px-2 py-1 text-center">${d.items.length}</td>
-            <td class="border px-2 py-1 text-right">${Number(d.totalAmount).toLocaleString()}</td>
+            <td class="border px-2 py-1 text-right">${Number(d.total).toLocaleString()}</td>
           `;
           tbody.appendChild(tr);
         });
       });
-    }
-
-    function showDetail(d) {
-      const box = document.getElementById("importDetail");
-      const detail = `
-        <p><strong>Code:</strong> ${d.id}</p>
-        <p><strong>Customer:</strong> ${d.customerName}</p>
-        <p><strong>Phone:</strong> ${d.phone}</p>
-        <p><strong>Address:</strong> ${d.address}</p>
-        <p><strong>ID Number:</strong> ${d.idNumber}</p>
-        <p><strong>Date:</strong> ${new Date(d.date).toLocaleString()}</p>
-        <hr class="my-2"/>
-        <p class="font-semibold mb-1">Items:</p>
-        <ul class="list-disc pl-5">
-          ${d.items.map(item => `<li>${item.name} (${item.unit}) x ${item.quantity} = ${Number(item.amount).toLocaleString()} đ</li>`).join("")}
-        </ul>
-        <hr class="my-2"/>
-        <p><strong>Total:</strong> ${Number(d.totalAmount).toLocaleString()} đ</p>
-      `;
-      document.getElementById("detailContent").innerHTML = detail;
-      box.classList.remove("hidden");
-      box.scrollIntoView({ behavior: "smooth" });
     }
   </script>
 </body>
