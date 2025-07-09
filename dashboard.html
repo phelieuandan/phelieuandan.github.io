@@ -3,14 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard - Phế Liệu An Dân</title>
-</head>
-<body>
-  <h2>Chào mừng, <span id="tenNguoiDung">người dùng</span>!</h2>
-  <button onclick="logout()">Đăng xuất</button>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- ✅ Nhúng Firebase SDK compat -->
+  <!-- ✅ Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- ✅ Firebase SDK compat -->
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+
+  <div class="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-xl font-semibold text-green-700">Xin chào, <span id="tenNguoiDung">người dùng</span>!</h2>
+      <button onclick="logout()" class="text-sm text-red-500 hover:underline">Đăng xuất</button>
+    </div>
+
+    <!-- Dashboard buttons -->
+    <div class="grid grid-cols-2 gap-4">
+      <button class="bg-green-600 text-white py-3 rounded hover:bg-green-700">Nhập kho</button>
+      <button class="bg-yellow-500 text-white py-3 rounded hover:bg-yellow-600">Xuất kho</button>
+      <button class="bg-blue-500 text-white py-3 rounded hover:bg-blue-600">Tồn kho</button>
+      <button class="bg-purple-500 text-white py-3 rounded hover:bg-purple-600">Chi phí</button>
+    </div>
+  </div>
 
   <script>
     const firebaseConfig = {
@@ -26,7 +44,6 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Kiểm tra nếu chưa đăng nhập thì chuyển về trang login
     firebase.auth().onAuthStateChanged(user => {
       if (user) {
         document.getElementById("tenNguoiDung").innerText = user.displayName || user.email;
@@ -36,7 +53,7 @@
     });
 
     function logout() {
-      firebase.auth().signOut().then(() => {
+      auth.signOut().then(() => {
         window.location.href = "index.html";
       });
     }
