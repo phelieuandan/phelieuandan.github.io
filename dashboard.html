@@ -225,25 +225,6 @@
         container.find("input, select").off("input").on("input", () => updateTotal(containerId));
       }
 
-      function getValidItems(containerId) {
-        const items = [];
-        $(`#${containerId} > div`).each(function() {
-          const name = $(this).find("input:eq(0)").val();
-          const unit = $(this).find("select").val();
-          const quantity = parseFloat($(this).find("input:eq(2)").val()) || 0;
-          const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
-          if (name && unit && quantity && price) {
-            items.push({
-              name,
-              unit,
-              quantity,
-              price
-            });
-          }
-        });
-        return items;
-      }
-
       function getNextId(type, prefix) {
         return db.ref(type).once("value").then(snap => {
           const count = snap.numChildren() + 1;
@@ -304,35 +285,60 @@ $('#importItems > div').each(function() {
     currentEditId = null;
     loadTable("imports", "importTable");
   });
-
-  console.log("Items:", items);
-console.log("Data to save:", data);
 };
 
 
+window.saveExport = async function () {
+  const name = $('#receiverName').val() || 'Không cung cấp thông tin';
+  const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
+  const date = new Date().toISOString();
+
+  const items = [];
+
+  $('#exportItems > div').each(function () {
+    const itemName = $(this).find('input:eq(0)').val().trim();
+    const unit = $(this).find('select').val();
+    const quantity = parseFloat($(this).find('.qty').val()) || 0;
+    const price = parseFloat($(this).find('.price').val()) || 0;
+
+    if (itemName && unit && quantity && price) {
+      items.push({
+        name: itemName,
+        unit: unit,
+        quantity: quantity,
+        price: price
+      });
+    }
+  });
+
+  if (items.length === 0) {
+    alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
+    return;
+  }
+
+  const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+  const id = currentEditId || await getNextId('exports', 'PXK');
+
+  const data = {
+    id,
+    name,
+    phone,
+    items,
+    total,
+    date
+  };
+
+  db.ref('exports/' + id).set(data).then(() => {
+    alert('Đã lưu xuất kho');
+    toggleForm(null);
+    currentEditId = null;
+    loadTable("exports", "exportTable");
+  });
+};
+
+
+
       
-      window.saveExport = async function() {
-        const name = $('#receiverName').val() || 'Không cung cấp thông tin';
-        const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
-        const items = getValidItems('exportItems');
-        const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-        const date = new Date().toISOString();
-        const id = currentEditId || await getNextId('exports', 'PXK');
-        const data = {
-          id,
-          name,
-          phone,
-          items,
-          total,
-          date
-        };
-        db.ref('exports/' + id).set(data).then(() => {
-          alert('Đã lưu xuất kho');
-          toggleForm(null);
-          currentEditId = null;
-          loadTable("exports", "exportTable");
-        });
-      };
       window.saveIncome = async function() {
         const amount = parseFloat($('#incomeAmount').val()) || 0;
         const sender = $('#incomeSender').val() || 'Không rõ';
