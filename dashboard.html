@@ -1,67 +1,67 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Phế Liệu An Dân - Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>An Dân Quân</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database-compat.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 </head>
+
 <body class="bg-gray-100 p-6">
   <div class="max-w-6xl mx-auto bg-white shadow rounded-lg p-6">
     <!-- Header -->
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold text-green-600">Xin chào, <span id="userName">Người dùng</span></h2>
-      <button onclick="logout()" class="text-sm text-red-600 hover:underline">Đăng xuất</button>
+      <h2 class="text-xl font-bold text-green-600">Hi, <span id="userName">Username</span></h2>
+      <button onclick="logout()" class="text-sm text-red-600 hover:underline">Sign out</button>
     </div>
 
-
     <!-- Buttons Thu/Chi -->
-<div class="flex gap-4 mb-6">
-  <button onclick="toggleForm('importForm')" class="bg-green-600 text-white px-4 py-2 rounded">+ Nhập kho</button>
-  <button onclick="toggleForm('exportForm')" class="bg-yellow-600 text-white px-4 py-2 rounded">+ Xuất kho</button>
-  <button onclick="toggleForm('incomeForm')" class="bg-blue-600 text-white px-4 py-2 rounded">+ Thu tiền</button>
-  <button onclick="toggleForm('expenseForm')" class="bg-red-600 text-white px-4 py-2 rounded">+ Chi tiền</button>
-</div>
+    <div class="flex gap-4 mb-6">
+      <button onclick="toggleForm('importForm')" class="bg-green-600 text-white px-4 py-2 rounded">+ Nhập kho</button>
+      <button onclick="toggleForm('exportForm')" class="bg-yellow-600 text-white px-4 py-2 rounded">+ Xuất kho</button>
+      <button onclick="toggleForm('incomeForm')" class="bg-blue-600 text-white px-4 py-2 rounded">+ Thu tiền</button>
+      <button onclick="toggleForm('expenseForm')" class="bg-red-600 text-white px-4 py-2 rounded">+ Chi tiền</button>
+    </div>
 
     <!-- Form Thu tiền -->
-<div id="incomeForm" class="hidden mb-6 bg-white shadow rounded p-4">
-  <h3 class="text-lg font-semibold mb-2">Thu tiền</h3>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <input type="number" id="incomeAmount" placeholder="Số tiền" class="border p-2 rounded">
-    <input type="text" id="incomeSender" placeholder="Người gửi" class="border p-2 rounded">
-    <select id="incomeSource" class="border p-2 rounded">
-      <option value="">Nguồn</option>
-      <option value="TM">TM</option>
-      <option value="VCB">VCB</option>
-      <option value="CK">CK</option>
-    </select>
-    <input type="text" id="incomeContent" placeholder="Nội dung" class="border p-2 rounded">
-  </div>
-  <textarea id="incomeNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-2"></textarea>
-  <button onclick="saveIncome()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Lưu thu tiền</button>
-</div>
+    <div id="incomeForm" class="hidden mb-6 bg-white shadow rounded p-4">
+      <h3 class="text-lg font-semibold mb-2">Thu tiền</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="number" id="incomeAmount" placeholder="Số tiền" class="border p-2 rounded">
+        <input type="text" id="incomeSender" placeholder="Người gửi" class="border p-2 rounded">
+        <select id="incomeSource" class="border p-2 rounded">
+          <option value="">Nguồn</option>
+          <option value="TM">TM</option>
+          <option value="VCB">VCB</option>
+          <option value="CK">CK</option>
+        </select>
+        <input type="text" id="incomeContent" placeholder="Nội dung" class="border p-2 rounded">
+      </div>
+      <textarea id="incomeNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-2"></textarea>
+      <button onclick="saveIncome()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Lưu thu tiền</button>
+    </div>
 
-<!-- Form Chi tiền -->
-<div id="expenseForm" class="hidden mb-6 bg-white shadow rounded p-4">
-  <h3 class="text-lg font-semibold mb-2">Chi tiền</h3>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
-    <input type="text" id="expenseContent" placeholder="Nội dung" class="border p-2 rounded">
-    <select id="expenseSource" class="border p-2 rounded">
-      <option value="">Nguồn</option>
-      <option value="TM">TM</option>
-      <option value="VCB">VCB</option>
-      <option value="CK">CK</option>
-    </select>
-  </div>
-  <textarea id="expenseNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-2"></textarea>
-  <button onclick="saveExpense()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Lưu chi tiền</button>
-</div>
+    <!-- Form Chi tiền -->
+    <div id="expenseForm" class="hidden mb-6 bg-white shadow rounded p-4">
+      <h3 class="text-lg font-semibold mb-2">Chi tiền</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
+        <input type="text" id="expenseContent" placeholder="Nội dung" class="border p-2 rounded">
+        <select id="expenseSource" class="border p-2 rounded">
+          <option value="">Nguồn</option>
+          <option value="TM">TM</option>
+          <option value="VCB">VCB</option>
+          <option value="CK">CK</option>
+        </select>
+      </div>
+      <textarea id="expenseNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-2"></textarea>
+      <button onclick="saveExpense()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Lưu chi tiền</button>
+    </div>
     <!-- Form Nhập Kho -->
     <div id="importForm" class="hidden border p-4 rounded bg-green-50 mb-6">
       <h3 class="font-semibold mb-2">Form Nhập Kho</h3>
@@ -119,79 +119,68 @@
       </thead>
       <tbody id="exportTable"></tbody>
     </table>
-  <!-- Bảng Thu Chi Tồn -->
-  <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Thu - Chi</h3>
-  <table class="w-full border text-sm">
-    <thead class="bg-gray-100">
-      <tr>
-        <th class="border px-2 py-1">Loại</th>
-        <th class="border px-2 py-1">Ngày</th>
-        <th class="border px-2 py-1">Số tiền</th>
-        <th class="border px-2 py-1">Người/Nội dung</th>
-        <th class="border px-2 py-1">Nguồn</th>
-        <th class="border px-2 py-1">Ghi chú</th>
-      </tr>
-    </thead>
-    <tbody id="incomeExpenseTable"></tbody>
-  </table>
+    <!-- Bảng Thu Chi Tồn -->
+    <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Thu - Chi</h3>
+    <table class="w-full border text-sm">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-2 py-1">Loại</th>
+          <th class="border px-2 py-1">Ngày</th>
+          <th class="border px-2 py-1">Số tiền</th>
+          <th class="border px-2 py-1">Người/Nội dung</th>
+          <th class="border px-2 py-1">Nguồn</th>
+          <th class="border px-2 py-1">Ghi chú</th>
+        </tr>
+      </thead>
+      <tbody id="incomeExpenseTable"></tbody>
+    </table>
 
-    
   </div>
-
-
-  <!-- Modal Chi tiết phiếu -->
-    <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div class="bg-white rounded-lg p-6 max-w-2xl w-full">
-        <h2 class="text-lg font-bold mb-2" id="modalTitle"></h2>
-        <pre id="modalContent" class="text-sm whitespace-pre-wrap"></pre>
-        <div class="flex justify-between mt-4">
-          <button id="editBtn" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Sửa</button>
-          <button id="deleteBtn" class="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600">Xoá</button>
-          <button onclick="closeModal()" class="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400">Đóng</button>
-        </div>
+  <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full">
+      <h2 class="text-lg font-bold mb-2" id="modalTitle"></h2>
+      <pre id="modalContent" class="text-sm whitespace-pre-wrap"></pre>
+      <div class="flex justify-between mt-4">
+        <button id="editBtn" class="px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600">Sửa</button>
+        <button id="deleteBtn" class="px-4 py-1 bg-red-500 text-white rounded hover:bg-red-600">Xoá</button>
+        <button onclick="closeModal()" class="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400">Đóng</button>
       </div>
     </div>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
-    authDomain: "warehouse689-d212c.firebaseapp.com",
-    databaseURL: "https://warehouse689-d212c-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "warehouse689-d212c",
-    storageBucket: "warehouse689-d212c.appspot.com",
-    messagingSenderId: "524439415659",
-    appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e"
-  };
-  firebase.initializeApp(firebaseConfig);
-
-  $(document).ready(function () {
-    const auth = firebase.auth();
-    const db = firebase.database();
-
-    let currentModalData = null;
-    let currentModalType = null;
-    let currentEditId = null;
-    let currentEditType = null;
-
-    auth.onAuthStateChanged(user => {
-      if (!user) return location.href = "index.html";
-      $("#userName").text(user.email);
-      loadTable("imports", "importTable");
-      loadTable("exports", "exportTable");
-      loadCashflow();
-    });
-
-    window.logout = function () {
-      auth.signOut().then(() => location.href = "index.html");
+  </div>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
+      authDomain: "warehouse689-d212c.firebaseapp.com",
+      databaseURL: "https://warehouse689-d212c-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "warehouse689-d212c",
+      storageBucket: "warehouse689-d212c.appspot.com",
+      messagingSenderId: "524439415659",
+      appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e"
     };
-
-    window.toggleForm = function (id) {
-      $("#importForm, #exportForm, #incomeForm, #expenseForm").addClass("hidden");
-      if (id) $("#" + id).removeClass("hidden");
-    };
-
-    window.addItem = function (containerId) {
-      const itemHtml = `
+    firebase.initializeApp(firebaseConfig);
+    $(document).ready(function() {
+      const auth = firebase.auth();
+      const db = firebase.database();
+      let currentModalData = null;
+      let currentModalType = null;
+      let currentEditId = null;
+      let currentEditType = null;
+      auth.onAuthStateChanged(user => {
+        if (!user) return location.href = "index.html";
+        $("#userName").text(user.email);
+        loadTable("imports", "importTable");
+        loadTable("exports", "exportTable");
+        loadCashflow();
+      });
+      window.logout = function() {
+        auth.signOut().then(() => location.href = "index.html");
+      };
+      window.toggleForm = function(id) {
+        $("#importForm, #exportForm, #incomeForm, #expenseForm").addClass("hidden");
+        if (id) $("#" + id).removeClass("hidden");
+      };
+      window.addItem = function(containerId) {
+        const itemHtml = `
         <div class="grid grid-cols-5 gap-2">
           <input placeholder="Tên hàng" class="border p-1 rounded" />
           <select class="border p-1 rounded">
@@ -203,46 +192,51 @@
           <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
         </div>
       `;
-      $("#" + containerId).append(itemHtml);
-      $("#" + containerId + " input, select").off("input").on("input", function () {
-        updateTotal(containerId);
-      });
-    };
+        $("#" + containerId).append(itemHtml);
+        $("#" + containerId + " input, select").off("input").on("input", function() {
+          updateTotal(containerId);
+        });
+      };
 
-    function updateTotal(containerId) {
-      let total = 0;
-      $(`#${containerId} > div`).each(function () {
-        const qty = parseFloat($(this).find("input:eq(2)").val()) || 0;
-        const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
-        const amt = qty * price;
-        $(this).find("input:eq(4)").val(amt.toLocaleString());
-        total += amt;
-      });
-      $("#" + (containerId === "importItems" ? "importTotal" : "exportTotal")).text(total.toLocaleString());
-    }
+      function updateTotal(containerId) {
+        let total = 0;
+        $(`#${containerId} > div`).each(function() {
+          const qty = parseFloat($(this).find("input:eq(2)").val()) || 0;
+          const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
+          const amt = qty * price;
+          $(this).find("input:eq(4)").val(amt.toLocaleString());
+          total += amt;
+        });
+        $("#" + (containerId === "importItems" ? "importTotal" : "exportTotal")).text(total.toLocaleString());
+      }
 
-    function getValidItems(containerId) {
-      const items = [];
-      $(`#${containerId} > div`).each(function () {
-        const name = $(this).find("input:eq(0)").val();
-        const unit = $(this).find("select").val();
-        const qty = parseFloat($(this).find("input:eq(2)").val()) || 0;
-        const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
-        if (name && unit && qty && price) {
-          items.push({ name, unit, quantity: qty, price });
-        }
-      });
-      return items;
-    }
+      function getValidItems(containerId) {
+        const items = [];
+        $(`#${containerId} > div`).each(function() {
+          const name = $(this).find("input:eq(0)").val();
+          const unit = $(this).find("select").val();
+          const qty = parseFloat($(this).find("input:eq(2)").val()) || 0;
+          const price = parseFloat($(this).find("input:eq(3)").val()) || 0;
+          if (name && unit && qty && price) {
+            items.push({
+              name,
+              unit,
+              quantity: qty,
+              price
+            });
+          }
+        });
+        return items;
+      }
 
-    function loadTable(type, tableId) {
-      const tbody = $("#" + tableId);
-      db.ref(type).on("value", snap => {
-        tbody.empty();
-        let index = 1;
-        snap.forEach(child => {
-          const d = child.val();
-          const row = `
+      function loadTable(type, tableId) {
+        const tbody = $("#" + tableId);
+        db.ref(type).on("value", snap => {
+          tbody.empty();
+          let index = 1;
+          snap.forEach(child => {
+            const d = child.val();
+            const row = `
             <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "${type}")'>
               <td class="border px-2 py-1">${index++}</td>
               <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
@@ -251,89 +245,87 @@
               <td class="border px-2 py-1 text-right">${Number(d.total || d.amount || 0).toLocaleString()}</td>
             </tr>
           `;
-          tbody.append(row);
+            tbody.append(row);
+          });
         });
-      });
-    }
-
-    window.showModal = function (data, type) {
-      currentModalData = data;
-      currentModalType = type;
-      let lines = [`Mã phiếu: ${data.id || ''}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name || data.sender || ''}`, `Tổng tiền: ${(data.total || data.amount || 0).toLocaleString()} đ`];
-      if (data.items) {
-        lines.push("--- Mặt hàng ---");
-        data.items.forEach((i, idx) => {
-          lines.push(`${idx + 1}. ${i.name} - ${i.quantity} ${i.unit} x ${i.price} = ${(i.quantity * i.price).toLocaleString()} đ`);
-        });
-      } else {
-        if (data.content) lines.push(`Nội dung: ${data.content}`);
-        if (data.source) lines.push(`Nguồn: ${data.source}`);
-        if (data.note) lines.push(`Ghi chú: ${data.note}`);
       }
-      $('#modalTitle').text(`Chi tiết ${data.id || ''}`);
-      $('#modalContent').text(lines.join("\n"));
-      $('#modalEditBtn').off().on('click', () => editRecord(data, type));
-      $('#modalDeleteBtn').off().on('click', () => deleteRecord(data.id, type));
-      $('#detailModal').removeClass('hidden');
-    }
-
-    function editRecord(data, type) {
-      currentEditId = data.id;
-      currentEditType = type;
-      if (type === 'imports') {
-        $('#customerName').val(data.name);
-        $('#address').val(data.address);
-        $('#cccd').val(data.cccd);
-        $('#phone').val(data.phone);
-        fillItems('importItems', data.items);
-        toggleForm('importForm');
-      } else if (type === 'exports') {
-        $('#receiverName').val(data.name);
-        $('#receiverPhone').val(data.phone);
-        fillItems('exportItems', data.items);
-        toggleForm('exportForm');
-      } else if (type === 'cashflow') {
-        if (data.type === 'thu') {
-          $('#incomeAmount').val(data.amount);
-          $('#incomeSender').val(data.sender);
-          $('#incomeSource').val(data.source);
-          $('#incomeContent').val(data.content);
-          $('#incomeNote').val(data.note);
-          toggleForm('incomeForm');
+      window.showModal = function(data, type) {
+        currentModalData = data;
+        currentModalType = type;
+        let lines = [`Mã phiếu: ${data.id || ''}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name || data.sender || ''}`, `Tổng tiền: ${(data.total || data.amount || 0).toLocaleString()} đ`];
+        if (data.items) {
+          lines.push("--- Mặt hàng ---");
+          data.items.forEach((i, idx) => {
+            lines.push(`${idx + 1}. ${i.name} - ${i.quantity} ${i.unit} x ${i.price} = ${(i.quantity * i.price).toLocaleString()} đ`);
+          });
         } else {
-          $('#expenseAmount').val(data.amount);
-          $('#expenseContent').val(data.content);
-          $('#expenseSource').val(data.source);
-          $('#expenseNote').val(data.note);
-          toggleForm('expenseForm');
+          if (data.content) lines.push(`Nội dung: ${data.content}`);
+          if (data.source) lines.push(`Nguồn: ${data.source}`);
+          if (data.note) lines.push(`Ghi chú: ${data.note}`);
+        }
+        $('#modalTitle').text(`Chi tiết ${data.id || ''}`);
+        $('#modalContent').text(lines.join("\n"));
+        $('#modalEditBtn').off().on('click', () => editRecord(data, type));
+        $('#modalDeleteBtn').off().on('click', () => deleteRecord(data.id, type));
+        $('#detailModal').removeClass('hidden');
+      }
+
+      function editRecord(data, type) {
+        currentEditId = data.id;
+        currentEditType = type;
+        if (type === 'imports') {
+          $('#customerName').val(data.name);
+          $('#address').val(data.address);
+          $('#cccd').val(data.cccd);
+          $('#phone').val(data.phone);
+          fillItems('importItems', data.items);
+          toggleForm('importForm');
+        } else if (type === 'exports') {
+          $('#receiverName').val(data.name);
+          $('#receiverPhone').val(data.phone);
+          fillItems('exportItems', data.items);
+          toggleForm('exportForm');
+        } else if (type === 'cashflow') {
+          if (data.type === 'thu') {
+            $('#incomeAmount').val(data.amount);
+            $('#incomeSender').val(data.sender);
+            $('#incomeSource').val(data.source);
+            $('#incomeContent').val(data.content);
+            $('#incomeNote').val(data.note);
+            toggleForm('incomeForm');
+          } else {
+            $('#expenseAmount').val(data.amount);
+            $('#expenseContent').val(data.content);
+            $('#expenseSource').val(data.source);
+            $('#expenseNote').val(data.note);
+            toggleForm('expenseForm');
+          }
+        }
+        closeModal();
+      }
+
+      function deleteRecord(id, type) {
+        if (!id) return;
+        if (confirm("Bạn có chắc muốn xoá phiếu này không?")) {
+          db.ref(`${type}/${id}`).remove().then(() => {
+            alert("Đã xoá phiếu thành công!");
+            closeModal();
+          });
         }
       }
-      closeModal();
-    }
-
-    function deleteRecord(id, type) {
-      if (!id) return;
-      if (confirm("Bạn có chắc muốn xoá phiếu này không?")) {
-        db.ref(`${type}/${id}`).remove().then(() => {
-          alert("Đã xoá phiếu thành công!");
-          closeModal();
-        });
+      window.closeModal = function() {
+        currentModalData = null;
+        currentEditId = null;
+        $('#detailModal').addClass('hidden');
       }
-    }
 
-    window.closeModal = function () {
-      currentModalData = null;
-      currentEditId = null;
-      $('#detailModal').addClass('hidden');
-    }
-
-    function loadCashflow() {
-      const tbody = $('#incomeExpenseTable');
-      tbody.empty();
-      db.ref('cashflow').orderByChild('date').once('value', snap => {
-        snap.forEach(child => {
-          const d = child.val();
-          const row = `
+      function loadCashflow() {
+        const tbody = $('#incomeExpenseTable');
+        tbody.empty();
+        db.ref('cashflow').orderByChild('date').once('value', snap => {
+          snap.forEach(child => {
+            const d = child.val();
+            const row = `
             <tr class="cursor-pointer hover:bg-gray-100" onclick='showModal(${JSON.stringify(d)}, "cashflow")'>
               <td class="border px-2 py-1 text-center">${d.type === 'thu' ? 'Thu' : 'Chi'}</td>
               <td class="border px-2 py-1 text-center">${new Date(d.date).toLocaleString()}</td>
@@ -342,17 +334,12 @@
               <td class="border px-2 py-1 text-center">${d.source || ''}</td>
               <td class="border px-2 py-1">${d.note || ''}</td>
             </tr>`;
-          tbody.append(row);
+            tbody.append(row);
+          });
         });
-      });
-    }
-  });
-</script>
-
-
-
-
-
-  
+      }
+    });
+  </script>
 </body>
+
 </html>
