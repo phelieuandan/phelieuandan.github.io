@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: 'vi' }}">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+  <!-- Favicon Links -->
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ site.baseurl }}/assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/assets/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ site.baseurl }}/assets/favicon/favicon-16x16.png">
+  <link rel="manifest" href="{{ site.baseurl }}/assets/favicon/site.webmanifest">
+  <link rel="mask-icon" href="{{ site.baseurl }}/assets/favicon/safari-pinned-tab.svg" color="#ff5a5f">
+  <link rel="shortcut icon" href="{{ site.baseurl }}/assets/favicon/favicon.ico">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-config" content="{{ site.baseurl }}/assets/favicon/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- GG Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+  <link href="https://fonts.googleapis.com/css2?family=Corinthia:wght@400;700&amp;family=Dosis:wght@200..800&amp;display=swap&amp;family=Elsie+Swash+Caps:wght@400;900&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
+
+  <!-- SEO Tags -->
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+  <link rel="alternate" href="{{ page.url | prepend: site.baseurl }}" hreflang="{{ page.lang | default: 'vi' }}">
+  
+  <title>{{ page.title | default: site.title }}</title>
+  
+  <meta name="description" content="{{ page.description | default: site.description }}">
+  <link rel="canonical" href="{{ page.url | prepend: site.baseurl }}">
+  
+  <meta property="og:locale" content="{{ site.locale | default: 'vi_VN' }}">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ page.title | default: site.title }}">
+  <meta property="og:description" content="{{ page.description | default: site.description }}">
+  <meta property="og:url" content="{{ page.url | prepend: site.baseurl }}">
+  <meta property="og:site_name" content="{{ site.name }}">
+  <meta property="article:modified_time" content="{{ page.date | date_to_xmlschema }}">
+  
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <!-- CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link nonce="" rel="stylesheet" href="https://i5.walmartimages.com/dfw/63fd9f59-4b35/3333268e-a5f3-44e6-b516-9f197ae28183/v2/en-US/_next/static/css/05d14e769cf804f5.css" data-n-g="">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tl2pink: "#EF7C8E",
+            tl2green: "#2E765E",
+            tl3red: "#DB1F48",
+            tl3green: "#01949A",
+            tl3blue: "#004369",
+            tl4green: "#062B0E",
+            tl4pink: "#F7ABC6",
+            tl4black: "#062B0E",
+            tl4gold: "#C6A47F",
+            tl3white: "#FFFFFF",
+          },
+        },
+        borderRadius: {
+          'extra-round': '0px',
+        },
+        fontFamily: {
+          cursive: ['"Imperial Script", cursive'],
+          poppins: ["Poppins, sans-serif"],
+          dancingScript: ['"Dancing Script", cursive'],
+          deltaGothic: ['"Dela Gothic One", sans-serif'],
+          farsan: ["Farsan, sans-serif"],
+          reemKufi: ["Reem Kufi, sans-serif"],
+          rozhaOne: ['"Rozha One", serif'],
+          dongle: ["Dongle, sans-serif"],
+          roadRage: ["'Road Rage', sans-serif"],
+          playfairDisplay: ["Libre Franklin, serif"],
+          dosis: ["Libre Franklin, sans-serif"],
+          elsie: ["Libre Franklin, serif"],
+          economica: ["Economica, sans-serif"],
+          charm: ["Charm, cursive"],
+          advent: ["'Advent Pro', sans-serif"],
+          courier: ["'Courier Prime', monospace"],
+          cherish: ["Cherish, cursive"],
+          anton: ["Anton, sans-serif"],
+        },
+        screens: {
+          sm: "640px",
+          md: "768px",
+          lg: "992px",
+          "2lg": "1024px",
+          xl: "1200px",
+          xxl: "1600px",
+          "2xl": "1920px",
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: Libre Franklin, sans-serif;
+    }
+    .ld {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font: normal normal normal 16px / 1 ui-icons;
+    font-size: inherit;
+}
+    .ld.ld-ChevronLeft:before {
+    content: "\f12e";
+}
+.ld.ld-ChevronRight:before {
+    content: "\f12f";
+}
+  
+    input[type="radio"] {
+      appearance: none;
+      background-color: transparent;
+      margin: 0;
+      font: inherit;
+      color: currentColor;
+      width: 20px;
+      height: 20px;
+      border: 1px solid #db1f48;
+      border-radius: 50%;
+      transform: translateY(-0.075em);
+      display: grid;
+      place-content: center;
+      cursor: pointer;
+    }
+  
+    input[type="radio"]::before {
+      content: "";
+      width: 0.65em;
+      height: 0.65em;
+      border-radius: 50%;
+      transform: scale(0);
+      transition: 120ms transform ease-in-out;
+      box-shadow: inset 1em 1em var(--form-control-color);
+      background-color: #db1f48;
+    }
+  
+    input[type="radio"]:checked::before {
+      transform: scale(1);
+    }
+  </style>
+
+    <style>
+        .slider {
+            position: relative;
+            width: 100%;
+            max-width: calc(100% - 32px);
+            overflow: hidden;
+          border-radius: 8px;
+            box-shadow: 0 0.0625rem 0.125rem 0.0625rem #00000026;
+              margin: 64px 16px;
+        }
+        .slides {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+        .slide {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+        .img {
+            width: 100%;
+            height: 100%;
+          object-fit: cover;
+        }
+        .buttons {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+        }
+        .button {
+  z-index: 5;
+  padding: 0;
+  background-color: #fff;
+  position: absolute;
+  display: block;
+  border-radius: 100%;
+  box-shadow: inset 0 0 0 0.0625rem #000;
+        }
+    </style>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function() {
+    const weddingDate = new Date("2024-10-07T11:00:00").getTime();
+
+    const updateCountdown = setInterval(() => {
+      const now = new Date().getTime();
+      const distance = weddingDate - now;
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      $("#countdown-days").text(days);
+      $("#countdown-hours").text(hours);
+      $("#countdown-minutes").text(minutes);
+      $("#countdown-seconds").text(seconds);
+
+      if (distance < 0) {
+        clearInterval(updateCountdown);
+        $("#countdown-days, #countdown-hours, #countdown-minutes, #countdown-seconds").text("0");
+        alert("Chúc mừng ngày cưới!");
+      }
+    }, 1000);
+
+    const updateElapsedTime = setInterval(() => {
+      const now = new Date().getTime();
+      const elapsed = now - weddingDate;
+
+      const elapsedDays = Math.floor(elapsed / (1000 * 60 * 60 * 24));
+      const elapsedHours = Math.floor((elapsed % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const elapsedMinutes = Math.floor((elapsed % (1000 * 60 * 60)) / (1000 * 60));
+      const elapsedSeconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+
+      console.log(`Đã trôi qua ${elapsedDays} ngày, ${elapsedHours} giờ, ${elapsedMinutes} phút, ${elapsedSeconds} giây`);
+    }, 1000);
+  });
+</script>
+  
+  <!-- Icons -->
+  <link rel="icon" href="{{ site.baseurl }}/assets/favicon/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" href="{{ site.baseurl }}/assets/favicon/android-chrome-192x192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="{{ site.baseurl }}/assets/favicon/apple-touch-icon.png">
+  <meta name="msapplication-TileImage" content="{{ site.baseurl }}/assets/favicon/favicon-32x32.png">
+</head>
+
+<body class="{{ page.class | default: 'home' }}">
+  <div class="offcanvas-wrap">
+    <div class="wrap" role="document">
+      <div class="content">
+        <main class="main" id="mainContent" tabindex="-1">
+          {{ content }}
+        </main>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
