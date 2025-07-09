@@ -160,24 +160,6 @@
     };
     firebase.initializeApp(firebaseConfig);
     $(document).ready(function() {
-      // Áp dụng cho tất cả input bên trong #importItems (nhập kho)
-      $(document).on('input', '#importForm .qty, #importForm .price', function() {
-        const row = $(this).closest('.grid');
-        const qty = parseFloat(row.find('.qty').val()) || 0;
-        const price = parseFloat(row.find('.price').val()) || 0;
-        const amount = qty * price;
-        row.find('input').eq(4).val(amount.toLocaleString());
-        updateTotal('importItems');
-      });
-      // Áp dụng cho tất cả input bên trong #exportItems (xuất kho)
-      $(document).on('input', '#exportForm .qty, #exportForm .price', function() {
-        const row = $(this).closest('.grid');
-        const qty = parseFloat(row.find('.qty').val()) || 0;
-        const price = parseFloat(row.find('.price').val()) || 0;
-        const amount = qty * price;
-        row.find('input').eq(4).val(amount.toLocaleString());
-        updateTotal('exportItems');
-      });
       const auth = firebase.auth();
       const db = firebase.database();
       let currentEditId = null;
@@ -198,32 +180,36 @@
       };
       window.addItem = function(containerId) {
         const itemHtml = `
-    <div class="grid grid-cols-5 gap-2">
-      <input placeholder="Tên hàng" class="border p-1 rounded" />
-      <select class="border p-1 rounded">
-        <option value="kg">Kg</option>
-        <option value="cái">Cái</option>
-      </select>
-      <input type="number" placeholder="Số lượng" class="border p-1 rounded qty" />
-      <input type="number" placeholder="Đơn giá" class="border p-1 rounded price" />
-      <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
-    </div>`;
+  <div class="grid grid-cols-5 gap-2">
+    <input placeholder="Tên hàng" class="border p-1 rounded" />
+    <select class="border p-1 rounded">
+      <option value="kg">Kg</option>
+      <option value="cái">Cái</option>
+    </select>
+    <input type="number" placeholder="Số lượng" class="border p-1 rounded qty" />
+    <input type="number" placeholder="Đơn giá" class="border p-1 rounded price" />
+    <input placeholder="Thành tiền" class="border p-1 rounded bg-gray-100" readonly />
+  </div>`;
         $("#" + containerId).append(itemHtml);
-        // Gắn lại sự kiện cho các input mới
-        bindItemEvents(containerId);
       };
-
-      function bindItemEvents(containerId) {
-        $(`#${containerId} .qty, #${containerId} .price`).off('input').on('input', function() {
-          const row = $(this).closest('div');
-          const qty = parseFloat(row.find('.qty').val()) || 0;
-          const price = parseFloat(row.find('.price').val()) || 0;
-          const amount = qty * price;
-          row.find('input:eq(4)').val(amount.toLocaleString());
-          updateTotal(containerId);
-        });
-      }
-      bindItemEvents('importItems');
+      // Cho cả nhập kho
+      $(document).on('input', '#importItems .qty, #importItems .price', function() {
+        const row = $(this).closest('.grid');
+        const qty = parseFloat(row.find('.qty').val()) || 0;
+        const price = parseFloat(row.find('.price').val()) || 0;
+        const amount = qty * price;
+        row.find('input').eq(4).val(amount.toLocaleString());
+        updateTotal('importItems');
+      });
+      // Cho cả xuất kho
+      $(document).on('input', '#exportItems .qty, #exportItems .price', function() {
+        const row = $(this).closest('.grid');
+        const qty = parseFloat(row.find('.qty').val()) || 0;
+        const price = parseFloat(row.find('.price').val()) || 0;
+        const amount = qty * price;
+        row.find('input').eq(4).val(amount.toLocaleString());
+        updateTotal('exportItems');
+      });
 
       function updateTotal(containerId) {
         let total = 0;
