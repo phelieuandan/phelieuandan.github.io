@@ -82,6 +82,17 @@
     </table>
   </div>
 
+  <!-- Modal Chi tiết phiếu -->
+  <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full">
+      <h2 class="text-lg font-bold mb-2" id="modalTitle"></h2>
+      <pre id="modalContent" class="text-sm whitespace-pre-wrap"></pre>
+      <div class="text-right mt-4">
+        <button onclick="closeModal()" class="px-4 py-1 bg-gray-300 rounded hover:bg-gray-400">Đóng</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
@@ -92,7 +103,6 @@
       messagingSenderId: "524439415659",
       appId: "1:524439415659:web:b0904ee6c3b1fdcfd77a2e"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
@@ -147,14 +157,24 @@
       document.getElementById(containerId === "importItems" ? "importTotal" : "exportTotal").innerText = total.toLocaleString();
     }
 
+    function getValidItems(containerId) {
+      const items = [];
+      document.querySelectorAll(`#${containerId} > div`).forEach(row => {
+        const [name, unit, qty, price] = Array.from(row.children).map(e => e.value);
+        if (name && unit && qty && price) {
+          items.push({ name, unit, quantity: +qty, price: +price });
+        }
+      });
+      return items;
+    }
+
     function saveImport() {
       const name = document.getElementById("customerName").value || "Không cung cấp";
       const address = document.getElementById("address").value || "Không cung cấp";
       const cccd = document.getElementById("cccd").value || "Không cung cấp";
       const phone = document.getElementById("phone").value || "Không cung cấp";
       const items = getValidItems("importItems");
-      if (items.length === 0) return alert("Chưa có mặt hàng hợp lệ!");
-
+      if (!items.length) return alert("Chưa có mặt hàng hợp lệ!");
       saveRecord("imports", { name, address, cccd, phone, items });
     }
 
@@ -162,20 +182,8 @@
       const name = document.getElementById("receiverName").value || "Không cung cấp";
       const phone = document.getElementById("receiverPhone").value || "Không cung cấp";
       const items = getValidItems("exportItems");
-      if (items.length === 0) return alert("Chưa có mặt hàng hợp lệ!");
-
+      if (!items.length) return alert("Chưa có mặt hàng hợp lệ!");
       saveRecord("exports", { name, phone, items });
-    }
-
-    function getValidItems(containerId) {
-      const items = [];
-      document.querySelectorAll(`#${containerId} > div`).forEach(row => {
-        const [ten, dvt, sl, dg] = Array.from(row.children).map(e => e.value);
-        if (ten && dvt && sl && dg) {
-          items.push({ name: ten, unit: dvt, quantity: sl, price: dg });
-        }
-      });
-      return items;
     }
 
     function saveRecord(type, data) {
@@ -183,15 +191,7 @@
         const count = snap.numChildren() + 1;
         const id = (type === "imports" ? "PNK" : "PXK") + String(count).padStart(3, "0");
         const total = data.items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-        db.ref(`${type}/${id}`).set({
-          id,
-          date: new Date().toISOString(),
-          ...data,
-          total
-        }).then(() => {
-          alert("Đã lưu thành công!");
-          location.reload();
-        });
+        db.ref(`${type}/${id}`).set({ id, date: new Date().toISOString(), ...data, total }).then(() => location.reload());
       });
     }
 
@@ -203,6 +203,8 @@
         snap.forEach(child => {
           const d = child.val();
           const tr = document.createElement("tr");
+          tr.className = "cursor-pointer hover:bg-gray-100";
+          tr.onclick = () => showModal(d);
           tr.innerHTML = `
             <td class="border px-2 py-1">${index++}</td>
             <td class="border px-2 py-1">${new Date(d.date).toLocaleDateString()}</td>
@@ -213,6 +215,20 @@
           tbody.appendChild(tr);
         });
       });
+    }
+
+    function showModal(data) {
+      const lines = [`Mã phiếu: ${data.id}`, `Ngày: ${new Date(data.date).toLocaleDateString()}`, `Người: ${data.name}`, `Tổng tiền: ${Number(data.total).toLocaleString()} đ`, "--- Mặt hàng ---"];
+      data.items.forEach((i, idx) => {
+        lines.push(`${idx + 1}. ${i.name} - ${i.quantity} ${i.unit} x ${i.price} = ${(i.quantity * i.price).toLocaleString()} đ`);
+      });
+      document.getElementById("modalTitle").innerText = `Chi tiết ${data.id}`;
+      document.getElementById("modalContent").innerText = lines.join("\n");
+      document.getElementById("detailModal").classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("detailModal").classList.add("hidden");
     }
   </script>
 </body>
