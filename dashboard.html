@@ -135,41 +135,40 @@
       <tbody id="incomeExpenseTable"></tbody>
     </table>
 
-<h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Tồn kho</h3>
-<table class="w-full border text-sm mb-6">
-  <thead class="bg-gray-100">
-    <tr>
-      <th class="border px-2 py-1">STT</th>
-      <th class="border px-2 py-1">Tên hàng</th>
-      <th class="border px-2 py-1 text-center">Số lượng</th>
-      <th class="border px-2 py-1 text-center">Đơn vị</th>
-      <th class="border px-2 py-1 text-right">Giá trị tồn</th>
-    </tr>
-  </thead>
-  <tbody id="inventoryTable"></tbody>
-</table>
+    <h3 class="text-lg font-semibold mb-2 mt-6">Danh sách Tồn kho</h3>
+    <table class="w-full border text-sm mb-6">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border px-2 py-1">STT</th>
+          <th class="border px-2 py-1">Tên hàng</th>
+          <th class="border px-2 py-1 text-center">Số lượng</th>
+          <th class="border px-2 py-1 text-center">Đơn vị</th>
+          <th class="border px-2 py-1 text-right">Giá trị tồn</th>
+        </tr>
+      </thead>
+      <tbody id="inventoryTable"></tbody>
+    </table>
 
     <h3 class="text-lg font-semibold mt-6 mb-2">Tiền hiện có theo nguồn</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-  <div class="p-4 border rounded bg-white shadow">
-    <div class="text-gray-500">TM</div>
-    <div id="cashTM" class="text-xl font-bold text-green-600">0 đ</div>
-  </div>
-  <div class="p-4 border rounded bg-white shadow">
-    <div class="text-gray-500">VCB</div>
-    <div id="cashVCB" class="text-xl font-bold text-green-600">0 đ</div>
-  </div>
-  <div class="p-4 border rounded bg-white shadow">
-    <div class="text-gray-500">CK</div>
-    <div id="cashCK" class="text-xl font-bold text-green-600">0 đ</div>
-  </div>
-</div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div class="p-4 border rounded bg-white shadow">
+        <div class="text-gray-500">TM</div>
+        <div id="cashTM" class="text-xl font-bold text-green-600">0 đ</div>
+      </div>
+      <div class="p-4 border rounded bg-white shadow">
+        <div class="text-gray-500">VCB</div>
+        <div id="cashVCB" class="text-xl font-bold text-green-600">0 đ</div>
+      </div>
+      <div class="p-4 border rounded bg-white shadow">
+        <div class="text-gray-500">CK</div>
+        <div id="cashCK" class="text-xl font-bold text-green-600">0 đ</div>
+      </div>
+    </div>
 
     <div class="p-4 border rounded bg-white shadow mb-4">
-  <h3 class="text-lg font-bold text-gray-700 mb-2">Lãi/Lỗ hiện tại</h3>
-  <div id="profitValue" class="text-2xl font-bold text-blue-600">Đang tính...</div>
-</div>
-
+      <h3 class="text-lg font-bold text-gray-700 mb-2">Lãi/Lỗ hiện tại</h3>
+      <div id="profitValue" class="text-2xl font-bold text-blue-600">Đang tính...</div>
+    </div>
 
     <!-- Modal -->
     <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -214,7 +213,6 @@
         $("#importForm, #exportForm, #incomeForm, #expenseForm").addClass("hidden");
         if (id) $("#" + id).removeClass("hidden");
       };
-      
       window.addItem = function(containerId) {
         const itemHtml = `
   <div class="grid grid-cols-5 gap-2">
@@ -267,114 +265,90 @@
           return prefix + String(count).padStart(6, '0');
         });
       }
-
-
-      
-window.saveImport = async function() {
-  const name = $('#customerName').val() || 'Không cung cấp thông tin';
-  const address = $('#address').val() || 'Không cung cấp thông tin';
-  const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
-  const phone = $('#phone').val() || 'Không cung cấp thông tin';
-  const date = new Date().toISOString();
-
-  const items = [];
-
-$('#importItems > div').each(function() {
-  const itemName = $(this).find('input:eq(0)').val().trim();
-  const unit = $(this).find('select').val();
-  const quantity = parseFloat($(this).find('.qty').val()) || 0;
-  const price = parseFloat($(this).find('.price').val()) || 0;
-
-  if (itemName && unit && quantity && price) {
-    items.push({
-      name: itemName,
-      unit: unit,
-      quantity: quantity,
-      price: price
-    });
-  }
-});
-
-
-  if (items.length === 0) {
-    alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
-    return;
-  }
-
-  const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-  const id = currentEditId || await getNextId('imports', 'PNK');
-
-  const data = {
-    id,
-    name,
-    address,
-    cccd,
-    phone,
-    items,
-    total,
-    date
-  };
-
-  db.ref('imports/' + id).set(data).then(() => {
-    alert('Đã lưu nhập kho');
-    toggleForm(null);
-    currentEditId = null;
-    loadTable("imports", "importTable");
-  });
-};
-
-
-window.saveExport = async function () {
-  const name = $('#receiverName').val() || 'Không cung cấp thông tin';
-  const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
-  const date = new Date().toISOString();
-
-  const items = [];
-
-  $('#exportItems > div').each(function () {
-    const itemName = $(this).find('input:eq(0)').val().trim();
-    const unit = $(this).find('select').val();
-    const quantity = parseFloat($(this).find('.qty').val()) || 0;
-    const price = parseFloat($(this).find('.price').val()) || 0;
-
-    if (itemName && unit && quantity && price) {
-      items.push({
-        name: itemName,
-        unit: unit,
-        quantity: quantity,
-        price: price
-      });
-    }
-  });
-
-  if (items.length === 0) {
-    alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
-    return;
-  }
-
-  const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-  const id = currentEditId || await getNextId('exports', 'PXK');
-
-  const data = {
-    id,
-    name,
-    phone,
-    items,
-    total,
-    date
-  };
-
-  db.ref('exports/' + id).set(data).then(() => {
-    alert('Đã lưu xuất kho');
-    toggleForm(null);
-    currentEditId = null;
-    loadTable("exports", "exportTable");
-  });
-};
-
-
-
-      
+      window.saveImport = async function() {
+        const name = $('#customerName').val() || 'Không cung cấp thông tin';
+        const address = $('#address').val() || 'Không cung cấp thông tin';
+        const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
+        const phone = $('#phone').val() || 'Không cung cấp thông tin';
+        const date = new Date().toISOString();
+        const items = [];
+        $('#importItems > div').each(function() {
+          const itemName = $(this).find('input:eq(0)').val().trim();
+          const unit = $(this).find('select').val();
+          const quantity = parseFloat($(this).find('.qty').val()) || 0;
+          const price = parseFloat($(this).find('.price').val()) || 0;
+          if (itemName && unit && quantity && price) {
+            items.push({
+              name: itemName,
+              unit: unit,
+              quantity: quantity,
+              price: price
+            });
+          }
+        });
+        if (items.length === 0) {
+          alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
+          return;
+        }
+        const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+        const id = currentEditId || await getNextId('imports', 'PNK');
+        const data = {
+          id,
+          name,
+          address,
+          cccd,
+          phone,
+          items,
+          total,
+          date
+        };
+        db.ref('imports/' + id).set(data).then(() => {
+          alert('Đã lưu nhập kho');
+          toggleForm(null);
+          currentEditId = null;
+          loadTable("imports", "importTable");
+        });
+      };
+      window.saveExport = async function() {
+        const name = $('#receiverName').val() || 'Không cung cấp thông tin';
+        const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
+        const date = new Date().toISOString();
+        const items = [];
+        $('#exportItems > div').each(function() {
+          const itemName = $(this).find('input:eq(0)').val().trim();
+          const unit = $(this).find('select').val();
+          const quantity = parseFloat($(this).find('.qty').val()) || 0;
+          const price = parseFloat($(this).find('.price').val()) || 0;
+          if (itemName && unit && quantity && price) {
+            items.push({
+              name: itemName,
+              unit: unit,
+              quantity: quantity,
+              price: price
+            });
+          }
+        });
+        if (items.length === 0) {
+          alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
+          return;
+        }
+        const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+        const id = currentEditId || await getNextId('exports', 'PXK');
+        const data = {
+          id,
+          name,
+          phone,
+          items,
+          total,
+          date
+        };
+        db.ref('exports/' + id).set(data).then(() => {
+          alert('Đã lưu xuất kho');
+          toggleForm(null);
+          currentEditId = null;
+          loadTable("exports", "exportTable");
+        });
+      };
       window.saveIncome = async function() {
         const amount = parseFloat($('#incomeAmount').val()) || 0;
         const sender = $('#incomeSender').val() || 'Không rõ';
@@ -528,69 +502,63 @@ window.saveExport = async function () {
           });
         });
       }
-// Tự động cập nhật Thành tiền khi nhập Số lượng hoặc Đơn giá
-$(document).on('input', '.qty, .price', function () {
-  const row = $(this).closest('.grid');
-  const qty = parseFloat(row.find('.qty').val()) || 0;
-  const price = parseFloat(row.find('.price').val()) || 0;
-  const amount = qty * price;
-  row.find('input[readonly]').val(amount.toLocaleString());
-
-  // Cập nhật tổng tiền
-  if ($(this).closest('#importItems').length) {
-    updateTotal('importItems');
-  } else if ($(this).closest('#exportItems').length) {
-    updateTotal('exportItems');
-  }
-});
+      // Tự động cập nhật Thành tiền khi nhập Số lượng hoặc Đơn giá
+      $(document).on('input', '.qty, .price', function() {
+        const row = $(this).closest('.grid');
+        const qty = parseFloat(row.find('.qty').val()) || 0;
+        const price = parseFloat(row.find('.price').val()) || 0;
+        const amount = qty * price;
+        row.find('input[readonly]').val(amount.toLocaleString());
+        // Cập nhật tổng tiền
+        if ($(this).closest('#importItems').length) {
+          updateTotal('importItems');
+        } else if ($(this).closest('#exportItems').length) {
+          updateTotal('exportItems');
+        }
+      });
 
       function calculateInventory() {
-  const inventory = {}; // { "N_Kg": { name: "N", unit: "Kg", quantity: 1, value: 10000 } }
-
-  function addItems(items, isImport) {
-    items.forEach(item => {
-      const key = item.name + '_' + item.unit;
-      if (!inventory[key]) {
-        inventory[key] = {
-          name: item.name,
-          unit: item.unit,
-          quantity: 0,
-          value: 0
-        };
-      }
-      if (isImport) {
-        inventory[key].quantity += item.quantity;
-        inventory[key].value += item.quantity * item.price;
-      } else {
-        inventory[key].quantity -= item.quantity;
-        inventory[key].value -= item.quantity * item.price;
-      }
-    });
-  }
-
-  // Lấy dữ liệu từ Firebase
-  db.ref('imports').once('value').then(importSnap => {
-    importSnap.forEach(importDoc => {
-      addItems(importDoc.val().items || [], true);
-    });
-
-    db.ref('exports').once('value').then(exportSnap => {
-      exportSnap.forEach(exportDoc => {
-        addItems(exportDoc.val().items || [], false);
-      });
-
-      // ✅ In kết quả tồn kho
-      const result = Object.values(inventory).filter(i => i.quantity > 0);
-      console.log("Tồn kho hiện tại:");
-      result.forEach(i => {
-        console.log(`${i.name} - ${i.quantity} ${i.unit} ~ ${i.value.toLocaleString()} đ`);
-      });
-
-      // Hoặc render ra DOM
-      const tableBody = $('#inventoryTable');
-      tableBody.empty();
-      result.forEach((i, index) => {
-        tableBody.append(`
+        const inventory = {}; // { "N_Kg": { name: "N", unit: "Kg", quantity: 1, value: 10000 } }
+        function addItems(items, isImport) {
+          items.forEach(item => {
+            const key = item.name + '_' + item.unit;
+            if (!inventory[key]) {
+              inventory[key] = {
+                name: item.name,
+                unit: item.unit,
+                quantity: 0,
+                value: 0
+              };
+            }
+            if (isImport) {
+              inventory[key].quantity += item.quantity;
+              inventory[key].value += item.quantity * item.price;
+            } else {
+              inventory[key].quantity -= item.quantity;
+              inventory[key].value -= item.quantity * item.price;
+            }
+          });
+        }
+        // Lấy dữ liệu từ Firebase
+        db.ref('imports').once('value').then(importSnap => {
+          importSnap.forEach(importDoc => {
+            addItems(importDoc.val().items || [], true);
+          });
+          db.ref('exports').once('value').then(exportSnap => {
+            exportSnap.forEach(exportDoc => {
+              addItems(exportDoc.val().items || [], false);
+            });
+            // ✅ In kết quả tồn kho
+            const result = Object.values(inventory).filter(i => i.quantity > 0);
+            console.log("Tồn kho hiện tại:");
+            result.forEach(i => {
+              console.log(`${i.name} - ${i.quantity} ${i.unit} ~ ${i.value.toLocaleString()} đ`);
+            });
+            // Hoặc render ra DOM
+            const tableBody = $('#inventoryTable');
+            tableBody.empty();
+            result.forEach((i, index) => {
+              tableBody.append(`
           <tr>
             <td class="border px-2 py-1 text-center">${index + 1}</td>
             <td class="border px-2 py-1">${i.name}</td>
@@ -599,103 +567,83 @@ $(document).on('input', '.qty, .price', function () {
             <td class="border px-2 py-1 text-right">${i.value.toLocaleString()} đ</td>
           </tr>
         `);
-      });
-    });
-  });
-}
-calculateInventory();
-
+            });
+          });
+        });
+      }
+      calculateInventory();
 
       function calculateCashBySource() {
-  const sources = {
-    TM: 0,
-    VCB: 0,
-    CK: 0
-  };
-
-  db.ref('cashflow').once('value').then(snap => {
-    snap.forEach(child => {
-      const d = child.val();
-      const amount = parseFloat(d.amount) || 0;
-      const source = d.source;
-
-      if (!source || !sources.hasOwnProperty(source)) return;
-
-      if (d.type === 'thu') {
-        sources[source] += amount;
-      } else if (d.type === 'chi') {
-        sources[source] -= amount;
+        const sources = {
+          TM: 0,
+          VCB: 0,
+          CK: 0
+        };
+        db.ref('cashflow').once('value').then(snap => {
+          snap.forEach(child => {
+            const d = child.val();
+            const amount = parseFloat(d.amount) || 0;
+            const source = d.source;
+            if (!source || !sources.hasOwnProperty(source)) return;
+            if (d.type === 'thu') {
+              sources[source] += amount;
+            } else if (d.type === 'chi') {
+              sources[source] -= amount;
+            }
+          });
+          // ✅ Hiển thị lên console
+          console.log("Tổng tiền theo nguồn:");
+          Object.keys(sources).forEach(key => {
+            console.log(`${key}: ${sources[key].toLocaleString()} đ`);
+          });
+          // ✅ Hoặc cập nhật lên giao diện
+          $('#cashTM').text(sources.TM.toLocaleString() + " đ");
+          $('#cashVCB').text(sources.VCB.toLocaleString() + " đ");
+          $('#cashCK').text(sources.CK.toLocaleString() + " đ");
+        });
       }
-    });
-
-    // ✅ Hiển thị lên console
-    console.log("Tổng tiền theo nguồn:");
-    Object.keys(sources).forEach(key => {
-      console.log(`${key}: ${sources[key].toLocaleString()} đ`);
-    });
-
-    // ✅ Hoặc cập nhật lên giao diện
-    $('#cashTM').text(sources.TM.toLocaleString() + " đ");
-    $('#cashVCB').text(sources.VCB.toLocaleString() + " đ");
-    $('#cashCK').text(sources.CK.toLocaleString() + " đ");
-  });
-}
-calculateCashBySource();
 
       function calculateProfitLoss() {
-  let totalExport = 0;
-  let totalImport = 0;
-  let totalExpense = 0;
-
-  const dbRef = firebase.database().ref();
-
-  Promise.all([
-    dbRef.child('exports').once('value'),
-    dbRef.child('imports').once('value'),
-    dbRef.child('cashflow').once('value')
-  ]).then(([exportsSnap, importsSnap, cashflowSnap]) => {
-    // Tổng tiền xuất kho (doanh thu)
-    exportsSnap.forEach(child => {
-      const data = child.val();
-      totalExport += parseFloat(data.total) || 0;
-    });
-
-    // Tổng tiền nhập kho (giá vốn)
-    importsSnap.forEach(child => {
-      const data = child.val();
-      totalImport += parseFloat(data.total) || 0;
-    });
-
-    // Tổng chi phí khác
-    cashflowSnap.forEach(child => {
-      const data = child.val();
-      if (data.type === 'chi') {
-        totalExpense += parseFloat(data.amount) || 0;
+        let totalExport = 0;
+        let totalImport = 0;
+        let totalExpense = 0;
+        const dbRef = firebase.database().ref();
+        Promise.all([
+          dbRef.child('exports').once('value'),
+          dbRef.child('imports').once('value'),
+          dbRef.child('cashflow').once('value')
+        ]).then(([exportsSnap, importsSnap, cashflowSnap]) => {
+          // Tổng tiền xuất kho (doanh thu)
+          exportsSnap.forEach(child => {
+            const data = child.val();
+            totalExport += parseFloat(data.total) || 0;
+          });
+          // Tổng tiền nhập kho (giá vốn)
+          importsSnap.forEach(child => {
+            const data = child.val();
+            totalImport += parseFloat(data.total) || 0;
+          });
+          // Tổng chi phí khác
+          cashflowSnap.forEach(child => {
+            const data = child.val();
+            if (data.type === 'chi') {
+              totalExpense += parseFloat(data.amount) || 0;
+            }
+          });
+          const profit = totalExport - totalImport - totalExpense;
+          $('#profitValue').text(profit.toLocaleString() + " đ");
+        });
       }
-    });
-
-    const profit = totalExport - totalImport - totalExpense;
-
-    console.log("Tổng doanh thu:", totalExport.toLocaleString());
-    console.log("Tổng giá vốn:", totalImport.toLocaleString());
-    console.log("Chi phí khác:", totalExpense.toLocaleString());
-    console.log("Lợi nhuận:", profit.toLocaleString());
-
-    $('#profitValue').text(profit.toLocaleString() + " đ");
-  });
-}
-
+      
       auth.onAuthStateChanged(user => {
-  if (!user) return location.href = "index.html";
-  $("#userName").text(user.email);
-  loadTable("imports", "importTable");
-  loadTable("exports", "exportTable");
-  loadCashflow();
-  calculateCashBySource();
-  calculateProfitLoss(); // 👈 gọi tính lãi lỗ
-});
-
-
+        if (!user) return location.href = "index.html";
+        $("#userName").text(user.email);
+        loadTable("imports", "importTable");
+        loadTable("exports", "exportTable");
+        loadCashflow();
+        calculateCashBySource();
+        calculateProfitLoss(); // 👈 gọi tính lãi lỗ
+      });
     });
   </script>
 
