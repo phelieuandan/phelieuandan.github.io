@@ -228,6 +228,38 @@
         container.find("input, select").off("input").on("input", () => updateTotal(containerId));
       }
 
+      window.saveImport = function () {
+        const name = $('#customerName').val() || 'Không cung cấp thông tin';
+        const address = $('#address').val() || 'Không cung cấp thông tin';
+        const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
+        const phone = $('#phone').val() || 'Không cung cấp thông tin';
+        const items = getValidItems('importItems');
+        const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+        const date = new Date().toISOString();
+        const id = currentEditId || db.ref().child('imports').push().key;
+        const data = { id, name, address, cccd, phone, items, total, date };
+        db.ref('imports/' + id).set(data).then(() => {
+          alert('Đã lưu nhập kho');
+          toggleForm(null);
+          currentEditId = null;
+        });
+      };
+    
+      window.saveExport = function () {
+        const name = $('#receiverName').val() || 'Không cung cấp thông tin';
+        const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
+        const items = getValidItems('exportItems');
+        const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+        const date = new Date().toISOString();
+        const id = currentEditId || db.ref().child('exports').push().key;
+        const data = { id, name, phone, items, total, date };
+        db.ref('exports/' + id).set(data).then(() => {
+          alert('Đã lưu xuất kho');
+          toggleForm(null);
+          currentEditId = null;
+        });
+      };
+
       function loadTable(type, tableId) {
         const tbody = $("#" + tableId);
         db.ref(type).on("value", snap => {
