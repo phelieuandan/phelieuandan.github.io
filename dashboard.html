@@ -23,6 +23,48 @@
       <button onclick="toggleForm('exportForm')" class="bg-yellow-600 text-white px-4 py-2 rounded">+ Xuất kho</button>
     </div>
 
+    <!-- Buttons Thu/Chi -->
+<div class="flex gap-4 mb-6">
+  <button onclick="toggleForm('importForm')" class="bg-green-600 text-white px-4 py-2 rounded">+ Nhập kho</button>
+  <button onclick="toggleForm('exportForm')" class="bg-yellow-600 text-white px-4 py-2 rounded">+ Xuất kho</button>
+  <button onclick="toggleForm('incomeForm')" class="bg-blue-600 text-white px-4 py-2 rounded">+ Thu tiền</button>
+  <button onclick="toggleForm('expenseForm')" class="bg-red-600 text-white px-4 py-2 rounded">+ Chi tiền</button>
+</div>
+
+    <!-- Form Thu tiền -->
+<div id="incomeForm" class="hidden mb-6 bg-white shadow rounded p-4">
+  <h3 class="text-lg font-semibold mb-2">Thu tiền</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <input type="number" id="incomeAmount" placeholder="Số tiền" class="border p-2 rounded">
+    <input type="text" id="incomeSender" placeholder="Người gửi" class="border p-2 rounded">
+    <select id="incomeSource" class="border p-2 rounded">
+      <option value="">Nguồn</option>
+      <option value="TM">TM</option>
+      <option value="VCB">VCB</option>
+      <option value="CK">CK</option>
+    </select>
+    <input type="text" id="incomeContent" placeholder="Nội dung" class="border p-2 rounded">
+  </div>
+  <textarea id="incomeNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-2"></textarea>
+  <button onclick="saveIncome()" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">Lưu thu tiền</button>
+</div>
+
+<!-- Form Chi tiền -->
+<div id="expenseForm" class="hidden mb-6 bg-white shadow rounded p-4">
+  <h3 class="text-lg font-semibold mb-2">Chi tiền</h3>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <input type="number" id="expenseAmount" placeholder="Số tiền" class="border p-2 rounded">
+    <input type="text" id="expenseContent" placeholder="Nội dung" class="border p-2 rounded">
+    <select id="expenseSource" class="border p-2 rounded">
+      <option value="">Nguồn</option>
+      <option value="TM">TM</option>
+      <option value="VCB">VCB</option>
+      <option value="CK">CK</option>
+    </select>
+  </div>
+  <textarea id="expenseNote" placeholder="Ghi chú" class="border p-2 rounded w-full mt-2"></textarea>
+  <button onclick="saveExpense()" class="mt-4 bg-red-600 text-white px-4 py-2 rounded">Lưu chi tiền</button>
+</div>
     <!-- Form Nhập Kho -->
     <div id="importForm" class="hidden border p-4 rounded bg-green-50 mb-6">
       <h3 class="font-semibold mb-2">Form Nhập Kho</h3>
@@ -81,6 +123,25 @@
       <tbody id="exportTable"></tbody>
     </table>
   </div>
+
+
+  <!-- Bảng Thu Chi Tồn -->
+<div class="mt-6">
+  <h3 class="text-lg font-semibold mb-2">Danh sách Thu - Chi</h3>
+  <table class="w-full border text-sm">
+    <thead class="bg-gray-100">
+      <tr>
+        <th class="border px-2 py-1">Loại</th>
+        <th class="border px-2 py-1">Ngày</th>
+        <th class="border px-2 py-1">Số tiền</th>
+        <th class="border px-2 py-1">Người/Nội dung</th>
+        <th class="border px-2 py-1">Nguồn</th>
+        <th class="border px-2 py-1">Ghi chú</th>
+      </tr>
+    </thead>
+    <tbody id="incomeExpenseTable"></tbody>
+  </table>
+</div>
 
   <!-- Modal Chi tiết phiếu -->
     <div id="detailModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
