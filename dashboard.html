@@ -178,13 +178,14 @@
         $("#importForm, #exportForm, #incomeForm, #expenseForm").addClass("hidden");
         if (id) $("#" + id).removeClass("hidden");
       };
+      
       window.addItem = function(containerId) {
         const itemHtml = `
   <div class="grid grid-cols-5 gap-2">
     <input placeholder="Tên hàng" class="border p-1 rounded" />
     <select class="border p-1 rounded">
-      <option value="kg">Kg</option>
-      <option value="cái">Cái</option>
+      <option value="Kg">Kg</option>
+      <option value="Cái">Cái</option>
     </select>
     <input type="number" placeholder="Số lượng" class="border p-1 rounded qty" />
     <input type="number" placeholder="Đơn giá" class="border p-1 rounded price" />
@@ -249,51 +250,64 @@
           return prefix + String(count).padStart(6, '0');
         });
       }
-      window.saveImport = async function() {
-        const name = $('#customerName').val() || 'Không cung cấp thông tin';
-        const address = $('#address').val() || 'Không cung cấp thông tin';
-        const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
-        const phone = $('#phone').val() || 'Không cung cấp thông tin';
-        const date = new Date().toISOString();
-        const items = [];
-        // Truy xuất từng hàng trong form nhập hàng
-        $('#importItems > div').each(function() {
-          const name = $(this).find('input:eq(0)').val().trim();
-          const unit = $(this).find('select').val();
-          const quantity = parseFloat($(this).find('input:eq(2)').val()) || 0;
-          const price = parseFloat($(this).find('input:eq(3)').val()) || 0;
-          if (name && unit && quantity && price) {
-            items.push({
-              name,
-              unit,
-              quantity,
-              price
-            });
-          }
-        });
-        if (items.length === 0) {
-          alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
-          return;
-        }
-        const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
-        const id = currentEditId || await getNextId('imports', 'PNK');
-        const data = {
-          id,
-          name,
-          address,
-          cccd,
-          phone,
-          items,
-          total,
-          date
-        };
-        db.ref('imports/' + id).set(data).then(() => {
-          alert('Đã lưu nhập kho');
-          toggleForm(null);
-          currentEditId = null;
-          loadTable("imports", "importTable");
-        });
-      };
+
+
+      
+window.saveImport = async function() {
+  const name = $('#customerName').val() || 'Không cung cấp thông tin';
+  const address = $('#address').val() || 'Không cung cấp thông tin';
+  const cccd = $('#cccd').val() || 'Không cung cấp thông tin';
+  const phone = $('#phone').val() || 'Không cung cấp thông tin';
+  const date = new Date().toISOString();
+
+  const items = [];
+
+  $('#importItems > div').each(function() {
+    const itemName = $(this).find('input:eq(0)').val().trim();
+    const unit = $(this).find('select').val(); // giữ nguyên hoa/thường
+    const quantity = parseFloat($(this).find('input:eq(2)').val()) || 0;
+    const price = parseFloat($(this).find('input:eq(3)').val()) || 0;
+
+    // Chỉ thêm nếu đủ thông tin
+    if (itemName && (unit === 'Kg' || unit === 'Cái') && quantity && price) {
+      items.push({
+        name: itemName,
+        unit: unit,
+        quantity: quantity,
+        price: price
+      });
+    }
+  });
+
+  if (items.length === 0) {
+    alert("Vui lòng nhập ít nhất một mặt hàng hợp lệ.");
+    return;
+  }
+
+  const total = items.reduce((sum, i) => sum + i.quantity * i.price, 0);
+  const id = currentEditId || await getNextId('imports', 'PNK');
+
+  const data = {
+    id,
+    name,
+    address,
+    cccd,
+    phone,
+    items,
+    total,
+    date
+  };
+
+  db.ref('imports/' + id).set(data).then(() => {
+    alert('Đã lưu nhập kho');
+    toggleForm(null);
+    currentEditId = null;
+    loadTable("imports", "importTable");
+  });
+};
+
+
+      
       window.saveExport = async function() {
         const name = $('#receiverName').val() || 'Không cung cấp thông tin';
         const phone = $('#receiverPhone').val() || 'Không cung cấp thông tin';
