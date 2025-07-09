@@ -11,8 +11,10 @@
   <input type="password" id="password" placeholder="Mật khẩu">
   <button onclick="login()">Đăng nhập</button>
 
+  <!-- Firebase SDK (phiên bản thuần, KHÔNG dùng import) -->
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAXfVdVR6ABdiJ2iyePUv_wR6AYuyFqZjs",
@@ -34,7 +36,7 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           alert("Đăng nhập thành công!");
-          window.location.href = "dashboard.html"; // Điều hướng về trang chính
+          window.location.href = "dashboard.html"; // Chuyển sang trang chủ
         })
         .catch(error => {
           alert("Đăng nhập thất bại: " + error.message);
