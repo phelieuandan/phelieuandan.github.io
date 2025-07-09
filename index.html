@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Đăng nhập - Phế Liệu An Dân</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
   <h2>Đăng nhập hệ thống</h2>
@@ -11,9 +10,9 @@
   <input type="password" id="password" placeholder="Mật khẩu">
   <button onclick="login()">Đăng nhập</button>
 
-  <!-- Firebase SDK (phiên bản thuần, KHÔNG dùng import) -->
-  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth.js"></script>
+  <!-- 🔥 Nhúng đúng phiên bản Firebase compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-auth-compat.js"></script>
 
   <script>
     const firebaseConfig = {
@@ -36,7 +35,7 @@
       auth.signInWithEmailAndPassword(email, password)
         .then(userCredential => {
           alert("Đăng nhập thành công!");
-          window.location.href = "dashboard.html"; // Chuyển sang trang chủ
+          window.location.href = "dashboard.html";
         })
         .catch(error => {
           alert("Đăng nhập thất bại: " + error.message);
