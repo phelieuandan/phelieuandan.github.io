@@ -375,8 +375,9 @@
       window.saveIncome = async function() {
         const amount = parseFloat($('#incomeAmount').val()) || 0;
         const sender = $('#incomeSender').val() || 'Không rõ';
-        const source = $('#incomeSource').val() || '';
         const content = $('#incomeContent').val() || '';
+        const category = $('#incomeCategory').val() || '';
+        const source = $('#incomeSource').val() || '';
         const note = $('#incomeNote').val() || '';
         const date = new Date().toISOString();
         const id = currentEditId || await getNextId('cashflow', 'PT');
@@ -385,8 +386,9 @@
           type: 'thu',
           amount,
           sender,
-          source,
           content,
+          category,
+          source,
           note,
           date
         };
@@ -399,7 +401,9 @@
       };
       window.saveExpense = async function() {
         const amount = parseFloat($('#expenseAmount').val()) || 0;
-        const content = $('#expenseContent').val() || 'Không rõ';
+        const sender = $('#expenseSender').val() || 'Không rõ';
+        const content = $('#expenseContent').val() || '';
+        const category = $('#expenseCategory').val() || '';
         const source = $('#expenseSource').val() || '';
         const note = $('#expenseNote').val() || '';
         const date = new Date().toISOString();
@@ -408,7 +412,9 @@
           id,
           type: 'chi',
           amount,
+          sender,
           content,
+          category,
           source,
           note,
           date
@@ -525,7 +531,6 @@
           });
         });
       }
-      // Tự động cập nhật Thành tiền khi nhập Số lượng hoặc Đơn giá
       $(document).on('input', '.qty, .price', function() {
         const row = $(this).closest('.grid');
         const qty = parseFloat(row.find('.qty').val()) || 0;
